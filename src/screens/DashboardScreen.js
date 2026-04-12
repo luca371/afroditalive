@@ -1,0 +1,565 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  collection, query, where, onSnapshot,
+  doc, updateDoc
+} from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
+import { db } from '../firebase';
+import './DashboardScreen.css';
+
+const VIEWS = ['Azi', 'Săptămână', 'Setări'];
+
+export default function DashboardScreen() {
+  const { user, salon, setSalon, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [view, setView]           = useState('Azi');
+  const [bookings, setBookings]   = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [menuOpen, setMenuOpen]   = useState(false);
+
+  // Fetch bookings in real-time
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(db, 'bookings'),
+      where('salonId', '==', user.uid)
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => {
+          if (a.date !== b.date) return a.date.localeCompare(b.date);
+          return (a.timeSlot || '').localeCompare(b.timeSlot || '');
+        });
+      setBookings(data);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, [user]);
+
+  async function handleStatus(bookingId, status) {
+    await updateDoc(doc(db, 'bookings', bookingId), { status });
+  }
+
+  async function handleLogout() {
+    await logout();
+    navigate('/');
+  }
+
+  // ── Helpers ──
+  const today = new Date().toISOString().split('T')[0];
+
+  const todayBookings = bookings.filter(b => b.date === today);
+
+  const [weekOffset, setWeekOffset] = useState(0);
+
+  // Săptămâna curentă + offset
+  function getWeekDays(offset = 0) {
+    const now = new Date();
+    const day = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
+    });
+  }
+  const weekDays = getWeekDays(weekOffset);
+  const DAY_NAMES = ['Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm', 'Dum'];
+
+  const HOURS = (() => {
+    const schedule = salon?.schedule;
+    if (!schedule) return Array.from({ length: 12 }, (_, i) => `${String(i + 8).padStart(2, '0')}:00`);
+
+    // Găsim cel mai devreme start și cel mai târziu end din zilele deschise
+    const openDays = Object.values(schedule).filter(d => d.open);
+    if (!openDays.length) return Array.from({ length: 12 }, (_, i) => `${String(i + 8).padStart(2, '0')}:00`);
+
+    const minHour = Math.min(...openDays.map(d => parseInt(d.from)));
+    const maxHour = Math.max(...openDays.map(d => parseInt(d.to)));
+
+    return Array.from(
+      { length: maxHour - minHour },
+      (_, i) => `${String(minHour + i).padStart(2, '0')}:00`
+    );
+  })();
+
+  function bookingsForDay(date) {
+    const dateStr = date.toISOString().split('T')[0];
+    return bookings.filter(b => b.date === dateStr);
+  }
+
+  const statusLabel = { confirmed: 'Confirmat', pending: 'În așteptare', cancelled: 'Anulat' };
+  const statusClass = { confirmed: 'db-status-confirmed', pending: 'db-status-pending', cancelled: 'db-status-cancelled' };
+
+  return (
+    <div className="db-page">
+
+      {/* ── SIDEBAR ── */}
+      <aside className={`db-sidebar ${menuOpen ? 'open' : ''}`}>
+        <div className="db-sidebar-logo">Afrodita</div>
+
+        <nav className="db-nav">
+          {VIEWS.map(v => (
+            <button
+              key={v}
+              className={`db-nav-item ${view === v ? 'active' : ''}`}
+              onClick={() => { setView(v); setMenuOpen(false); }}
+            >
+              {v === 'Azi'       && <IconToday />}
+              {v === 'Săptămână' && <IconCalendar />}
+              {v === 'Setări'    && <IconSettings />}
+              {v}
+            </button>
+          ))}
+        </nav>
+
+        <div className="db-sidebar-bottom">
+          <div className="db-salon-info">
+            <div className="db-salon-name">{salon?.name || 'Salonul meu'}</div>
+            <div className="db-salon-plan">{salon?.plan || 'free'}</div>
+          </div>
+          <button className="db-logout" onClick={handleLogout}>
+            <IconLogout /> Deconectare
+          </button>
+        </div>
+      </aside>
+
+      {/* ── MAIN ── */}
+      <main className="db-main">
+
+        {/* Header */}
+        <header className="db-header">
+          <button className="db-menu-btn" onClick={() => setMenuOpen(o => !o)}>
+            <span /><span /><span />
+          </button>
+          <div className="db-header-title">
+            {view === 'Azi' && (
+              <>
+                <h1>Programările de azi</h1>
+                <span>{formatDate(new Date())}</span>
+              </>
+            )}
+            {view === 'Săptămână' && <h1>Calendar săptămânal</h1>}
+            {view === 'Setări'    && <h1>Setări salon</h1>}
+          </div>
+          <a
+            href={`/book/${salon?.slug || ''}`}
+            target="_blank"
+            rel="noreferrer"
+            className="db-booking-link"
+          >
+            Link booking →
+          </a>
+        </header>
+
+        {/* ── VIEW: AZI ── */}
+        {view === 'Azi' && (
+          <div className="db-content">
+            {/* Stats */}
+            <div className="db-stats">
+              <div className="db-stat">
+                <span className="db-stat-num">{todayBookings.length}</span>
+                <span className="db-stat-label">Total azi</span>
+              </div>
+              <div className="db-stat">
+                <span className="db-stat-num">{todayBookings.filter(b => b.status === 'confirmed').length}</span>
+                <span className="db-stat-label">Confirmate</span>
+              </div>
+              <div className="db-stat">
+                <span className="db-stat-num">{todayBookings.filter(b => b.status === 'pending').length}</span>
+                <span className="db-stat-label">În așteptare</span>
+              </div>
+              <div className="db-stat">
+                <span className="db-stat-num">{bookings.filter(b => b.date >= today).length}</span>
+                <span className="db-stat-label">Viitoare total</span>
+              </div>
+            </div>
+
+            {/* Bookings list */}
+            {loading ? (
+              <div className="db-empty">Se încarcă...</div>
+            ) : todayBookings.length === 0 ? (
+              <div className="db-empty">
+                <div className="db-empty-icon">◎</div>
+                <p>Nicio programare pentru azi.</p>
+                <a href={`/book/${salon?.slug || ''}`} target="_blank" rel="noreferrer" className="db-empty-link">
+                  Partajează linkul de booking →
+                </a>
+              </div>
+            ) : (
+              <div className="db-bookings-list">
+                {todayBookings.map(b => (
+                  <div key={b.id} className={`db-booking-card ${b.status === 'cancelled' ? 'cancelled' : ''}`}>
+                    <div className="db-booking-time">{b.timeSlot}</div>
+                    <div className="db-booking-info">
+                      <div className="db-booking-name">{b.clientName}</div>
+                      <div className="db-booking-meta">
+                        {b.serviceName} · {b.employeeName}
+                        {b.clientPhone && <> · {b.clientPhone}</>}
+                      </div>
+                    </div>
+                    <div className="db-booking-right">
+                      <span className={`db-status ${statusClass[b.status]}`}>
+                        {statusLabel[b.status]}
+                      </span>
+                      {b.status !== 'cancelled' && (
+                        <div className="db-booking-actions">
+                          {b.status !== 'confirmed' && (
+                            <button
+                              className="db-btn-confirm"
+                              onClick={() => handleStatus(b.id, 'confirmed')}
+                            >
+                              Confirmă
+                            </button>
+                          )}
+                          <button
+                            className="db-btn-cancel"
+                            onClick={() => handleStatus(b.id, 'cancelled')}
+                          >
+                            Anulează
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── VIEW: SĂPTĂMÂNĂ ── */}
+        {view === 'Săptămână' && (
+          <div className="db-content db-content-calendar">
+            <div className="db-calendar">
+              {/* Navigare săptămână */}
+              <div className="db-cal-nav">
+                <button onClick={() => setWeekOffset(o => o - 1)}>‹ Anterior</button>
+                <span>
+                  {weekDays[0].toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' })}
+                  {' — '}
+                  {weekDays[6].toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {weekOffset === 0 && <span className="db-cal-nav-today"> · Săptămâna curentă</span>}
+                </span>
+                <button onClick={() => setWeekOffset(o => o + 1)}>Următor ›</button>
+              </div>
+
+              {/* Header zile */}
+              <div className="db-cal-header">
+                <div className="db-cal-time-col" />
+                {weekDays.map((d, i) => {
+                  const isToday = d.toISOString().split('T')[0] === today;
+                  return (
+                    <div key={i} className={`db-cal-day-header ${isToday ? 'today' : ''}`}>
+                      <span className="db-cal-day-name">{DAY_NAMES[i]}</span>
+                      <span className="db-cal-day-num">{d.getDate()}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Grid ore */}
+              <div className="db-cal-body">
+                {HOURS.map(hour => (
+                  <div key={hour} className="db-cal-row">
+                    <div className="db-cal-time">{hour}</div>
+                    {weekDays.map((d, i) => {
+                      const dayBookings = bookingsForDay(d).filter(b =>
+                        b.timeSlot && b.timeSlot.startsWith(hour.substring(0, 2))
+                      );
+                      return (
+                        <div key={i} className="db-cal-cell">
+                          {dayBookings.map(b => (
+                            <div
+                              key={b.id}
+                              className={`db-cal-event ${statusClass[b.status]}`}
+                              title={`${b.clientName} · ${b.serviceName}`}
+                            >
+                              <span className="db-cal-event-time">{b.timeSlot}</span>
+                              <span className="db-cal-event-name">{b.clientName}</span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── VIEW: SETĂRI ── */}
+        {view === 'Setări' && (
+          <SettingsView user={user} salon={salon} setSalon={setSalon} navigate={navigate} />
+        )}
+      </main>
+
+      {/* Overlay mobile */}
+      {menuOpen && <div className="db-overlay" onClick={() => setMenuOpen(false)} />}
+    </div>
+  );
+}
+
+// ── Settings View ──
+const DAYS = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'];
+
+function SettingsView({ user, salon, setSalon, navigate }) {
+  const [tab, setTab]       = useState('info');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+  const [error, setError]   = useState('');
+
+  const [info, setInfo] = useState({
+    name:    salon?.name    || '',
+    phone:   salon?.phone   || '',
+    address: salon?.address || '',
+    city:    salon?.city    || '',
+  });
+
+  const [services, setServices] = useState(
+    salon?.services?.length ? salon.services : [{ name: '', duration: 60, price: '' }]
+  );
+
+  const [employees, setEmployees] = useState(
+    salon?.employees?.length ? salon.employees : [{ name: '', role: '' }]
+  );
+
+  const [schedule, setSchedule] = useState(
+    salon?.schedule || DAYS.reduce((acc, d) => ({
+      ...acc, [d]: { open: d !== 'Duminică', from: '09:00', to: '19:00' }
+    }), {})
+  );
+
+  async function handleSave() {
+    setSaving(true); setError(''); setSaved(false);
+    try {
+      const payload = tab === 'info'     ? { ...info }
+                    : tab === 'servicii' ? { services }
+                    : tab === 'angajati' ? { employees }
+                    :                      { schedule };
+      await updateDoc(doc(db, 'salons', user.uid), { ...payload, updatedAt: new Date().toISOString() });
+      setSalon(prev => ({ ...prev, ...payload }));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      setError('Eroare la salvare. Încearcă din nou.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const updateSvc  = (i, f, v) => setServices(p  => p.map((s, idx) => idx === i ? { ...s, [f]: v } : s));
+  const addSvc     = ()        => setServices(p  => [...p, { name: '', duration: 60, price: '' }]);
+  const removeSvc  = (i)       => setServices(p  => p.filter((_, idx) => idx !== i));
+  const updateEmp  = (i, f, v) => setEmployees(p => p.map((e, idx) => idx === i ? { ...e, [f]: v } : e));
+  const addEmp     = ()        => setEmployees(p => [...p, { name: '', role: '' }]);
+  const removeEmp  = (i)       => setEmployees(p => p.filter((_, idx) => idx !== i));
+  const toggleDay  = (d)       => setSchedule(p  => ({ ...p, [d]: { ...p[d], open: !p[d].open } }));
+  const updateHour = (d, f, v) => setSchedule(p  => ({ ...p, [d]: { ...p[d], [f]: v } }));
+
+  const TABS = [
+    { id: 'info',     label: 'Informații' },
+    { id: 'servicii', label: 'Servicii'   },
+    { id: 'angajati', label: 'Angajați'   },
+    { id: 'program',  label: 'Program'    },
+  ];
+
+  return (
+    <div className="db-content">
+      <div className="db-settings">
+
+        {/* Plan banner */}
+        <div className="db-plan-banner">
+          <div className="db-plan-banner-left">
+            <span className="db-plan-badge">{salon?.plan || 'Free'}</span>
+            <span className="db-plan-desc">Link booking: </span>
+            <a href={`/book/${salon?.slug}`} target="_blank" rel="noreferrer" className="db-plan-link">
+              /book/{salon?.slug}
+            </a>
+          </div>
+          <button className="db-upgrade-btn" onClick={() => navigate('/#pricing')}>
+            Upgrade →
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="db-settings-tabs">
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              className={`db-settings-tab ${tab === t.id ? 'active' : ''}`}
+              onClick={() => { setTab(t.id); setError(''); setSaved(false); }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="db-settings-section">
+
+          {/* INFO */}
+          {tab === 'info' && (
+            <div className="db-set-fields">
+              {[
+                { label: 'Numele salonului', key: 'name',    ph: 'Studio Lumière'  },
+                { label: 'Telefon',          key: 'phone',   ph: '07xx xxx xxx'    },
+                { label: 'Adresă',           key: 'address', ph: 'Str. Florilor 12'},
+                { label: 'Oraș',             key: 'city',    ph: 'București'       },
+              ].map(f => (
+                <div key={f.key} className="db-set-field">
+                  <label>{f.label}</label>
+                  <input
+                    value={info[f.key]}
+                    onChange={e => setInfo(p => ({ ...p, [f.key]: e.target.value }))}
+                    placeholder={f.ph}
+                  />
+                </div>
+              ))}
+              <div className="db-set-field db-set-field-readonly">
+                <label>Email cont</label>
+                <input value={salon?.email || ''} readOnly />
+              </div>
+            </div>
+          )}
+
+          {/* SERVICII */}
+          {tab === 'servicii' && (
+            <>
+              <div className="db-set-list">
+                {services.map((s, i) => (
+                  <div key={i} className="db-set-list-item">
+                    <div className="db-set-list-fields">
+                      <div className="db-set-field db-set-field-grow">
+                        <label>Serviciu</label>
+                        <input value={s.name} onChange={e => updateSvc(i, 'name', e.target.value)} placeholder="ex. Tuns + coafat" />
+                      </div>
+                      <div className="db-set-field db-set-field-sm">
+                        <label>Durată (min)</label>
+                        <input type="number" min="15" step="15" value={s.duration} onChange={e => updateSvc(i, 'duration', Number(e.target.value))} />
+                      </div>
+                      <div className="db-set-field db-set-field-sm">
+                        <label>Preț (lei)</label>
+                        <input type="number" min="0" value={s.price} onChange={e => updateSvc(i, 'price', e.target.value)} placeholder="150" />
+                      </div>
+                    </div>
+                    {services.length > 1 && (
+                      <button className="db-set-remove" onClick={() => removeSvc(i)}>✕</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button className="db-set-add" onClick={addSvc}>+ Adaugă serviciu</button>
+            </>
+          )}
+
+          {/* ANGAJAȚI */}
+          {tab === 'angajati' && (
+            <>
+              <div className="db-set-list">
+                {employees.map((e, i) => (
+                  <div key={i} className="db-set-list-item">
+                    <div className="db-set-list-fields">
+                      <div className="db-set-field db-set-field-grow">
+                        <label>Nume</label>
+                        <input value={e.name} onChange={ev => updateEmp(i, 'name', ev.target.value)} placeholder="ex. Andreea" />
+                      </div>
+                      <div className="db-set-field db-set-field-grow">
+                        <label>Rol</label>
+                        <input value={e.role} onChange={ev => updateEmp(i, 'role', ev.target.value)} placeholder="ex. Stilist" />
+                      </div>
+                    </div>
+                    {employees.length > 1 && (
+                      <button className="db-set-remove" onClick={() => removeEmp(i)}>✕</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button className="db-set-add" onClick={addEmp}>+ Adaugă angajat</button>
+            </>
+          )}
+
+          {/* PROGRAM */}
+          {tab === 'program' && (
+            <div className="db-set-schedule">
+              {DAYS.map(day => (
+                <div key={day} className={`db-set-schedule-row ${!schedule[day]?.open ? 'closed' : ''}`}>
+                  <button
+                    className={`db-set-day-toggle ${schedule[day]?.open ? 'on' : 'off'}`}
+                    onClick={() => toggleDay(day)}
+                  >
+                    <span className="db-set-toggle-track">
+                      <span className="db-set-toggle-thumb" />
+                    </span>
+                    <span className="db-set-day-name">{day}</span>
+                  </button>
+                  {schedule[day]?.open ? (
+                    <div className="db-set-hours">
+                      <input type="time" value={schedule[day].from} onChange={e => updateHour(day, 'from', e.target.value)} />
+                      <span>—</span>
+                      <input type="time" value={schedule[day].to}   onChange={e => updateHour(day, 'to',   e.target.value)} />
+                    </div>
+                  ) : (
+                    <span className="db-set-closed">Închis</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+
+        {/* Save bar */}
+        <div className="db-save-bar">
+          {error && <span className="db-save-error">{error}</span>}
+          {saved && <span className="db-save-ok">✓ Salvat cu succes</span>}
+          <button className="db-save-btn" onClick={handleSave} disabled={saving}>
+            {saving ? 'Se salvează...' : 'Salvează modificările'}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ── Helpers ──
+function formatDate(d) {
+  return d.toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+// ── Icons ──
+function IconToday() {
+  return (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+      <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+    </svg>
+  );
+}
+function IconCalendar() {
+  return (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+    </svg>
+  );
+}
+function IconSettings() {
+  return (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+  );
+}
+function IconLogout() {
+  return (
+    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+    </svg>
+  );
+}

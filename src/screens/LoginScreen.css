@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --espresso-deep: #1a0e09;
+  --espresso-mid:  #3d2318;
+  --rose:          #C9A87C;
+  --rose-light:    #dfc9a5;
+  --offwhite:      #FAF7F2;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.auth-page {
+  min-height: 100vh;
+  background: var(--espresso-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--sans);
+}
+
+/* Background glow */
+.auth-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(201,168,124,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Logo */
+.auth-logo {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--rose);
+  text-decoration: none;
+  margin-bottom: 48px;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.2s;
+}
+.auth-logo:hover { opacity: 0.8; }
+
+/* Card */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(61,35,24,0.4);
+  border: 1px solid rgba(201,168,124,0.15);
+  border-radius: 8px;
+  padding: 48px 40px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(8px);
+  animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.auth-card-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--offwhite);
+  margin-bottom: 36px;
+  line-height: 1.1;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.auth-field label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(250,247,242,0.45);
+  font-weight: 500;
+}
+
+.auth-field input {
+  background: rgba(250,247,242,0.05);
+  border: 1px solid rgba(201,168,124,0.18);
+  border-radius: 4px;
+  padding: 13px 16px;
+  font-size: 14px;
+  color: var(--offwhite);
+  font-family: var(--sans);
+  font-weight: 300;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+.auth-field input::placeholder { color: rgba(250,247,242,0.2); }
+.auth-field input:focus {
+  border-color: rgba(201,168,124,0.45);
+  background: rgba(250,247,242,0.07);
+}
+
+/* Error */
+.auth-error {
+  font-size: 13px;
+  color: #f0837a;
+  background: rgba(240,131,122,0.1);
+  border: 1px solid rgba(240,131,122,0.2);
+  border-radius: 4px;
+  padding: 10px 14px;
+  line-height: 1.5;
+}
+
+/* Submit button */
+.auth-btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--espresso-deep);
+  background: var(--rose);
+  border: none;
+  border-radius: 4px;
+  padding: 15px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(201,168,124,0.2);
+  margin-top: 4px;
+}
+.auth-btn:hover:not(:disabled) {
+  background: var(--rose-light);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(201,168,124,0.3);
+}
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Footer link */
+.auth-footer {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(250,247,242,0.35);
+}
+.auth-footer a {
+  color: var(--rose);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.auth-footer a:hover { color: var(--rose-light); }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card { padding: 36px 24px; }
+  .auth-card-title { font-size: 26px; }
+}
