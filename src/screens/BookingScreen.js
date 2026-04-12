@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   collection, query, where, getDocs,
-  addDoc, doc, getDoc
+  addDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import './BookingScreen.css';
@@ -43,12 +43,8 @@ export default function BookingScreen() {
   }, [salonSlug]);
 
   // Compute available slots when date + employee + service selected
-  useEffect(() => {
+  const computeSlots = useCallback(async () => {
     if (!selectedDate || !selectedEmployee || !selectedService || !salon) return;
-    computeSlots();
-  }, [selectedDate, selectedEmployee, selectedService]);
-
-  async function computeSlots() {
     setLoadingSlots(true);
     setSlot(null);
 
@@ -58,7 +54,6 @@ export default function BookingScreen() {
 
     if (!daySchedule?.open) { setSlots([]); setLoadingSlots(false); return; }
 
-    // Fetch existing bookings for that day + employee
     const q = query(
       collection(db, 'bookings'),
       where('salonId',    '==', salon.id),
@@ -79,7 +74,11 @@ export default function BookingScreen() {
 
     setSlots(slots);
     setLoadingSlots(false);
-  }
+  }, [selectedDate, selectedEmployee, selectedService, salon]);
+
+  useEffect(() => {
+    computeSlots();
+  }, [computeSlots]);
 
   async function handleConfirm() {
     if (!clientName.trim() || !clientPhone.trim()) {
