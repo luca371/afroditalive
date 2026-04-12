@@ -470,7 +470,17 @@
 }
 .bk-success-card h2 {
   font-family: var(--serif); font-size: 28px; font-weight: 300;
-  color: var(--offwhite); margin-bottom: 28px;
+  color: var(--offwhite); margin-bottom: 12px;
+}
+.bk-success-subtitle {
+  font-size: 14px;
+  color: rgba(250,247,242,0.5);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.bk-success-subtitle strong {
+  color: var(--rose);
+  font-weight: 400;
 }
 .bk-success-details {
   background: rgba(250,247,242,0.03);
@@ -489,6 +499,18 @@
 .bk-success-note {
   font-size: 14px; color: rgba(250,247,242,0.4);
   line-height: 1.7;
+}
+.bk-success-cancel {
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(250,247,242,0.3);
+  border-top: 1px solid rgba(201,168,124,0.1);
+  padding-top: 16px;
+  line-height: 1.6;
+}
+.bk-success-cancel strong {
+  color: var(--rose);
+  font-weight: 400;
 }
 
 /* ── FOOTER ── */

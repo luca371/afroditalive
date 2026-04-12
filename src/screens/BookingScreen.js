@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  collection, query, where, getDocs,
-  addDoc
+  collection, query, where, getDocs, addDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import './BookingScreen.css';
@@ -26,6 +25,7 @@ export default function BookingScreen() {
 
   const [clientName, setClientName]   = useState('');
   const [clientPhone, setClientPhone] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
   const [submitting, setSubmitting]   = useState(false);
   const [bookingDone, setBookingDone] = useState(false);
   const [error, setError]             = useState('');
@@ -90,6 +90,7 @@ export default function BookingScreen() {
         salonId:      salon.id,
         clientName:   clientName.trim(),
         clientPhone:  clientPhone.trim(),
+        clientEmail:  clientEmail.trim(),
         serviceId:    selectedService.name,
         serviceName:  selectedService.name,
         employeeId:   selectedEmployee.name,
@@ -100,6 +101,7 @@ export default function BookingScreen() {
         status:       'pending',
         createdAt:    new Date().toISOString(),
       });
+
       setBookingDone(true);
     } catch {
       setError('A apărut o eroare. Încearcă din nou.');
@@ -130,7 +132,11 @@ export default function BookingScreen() {
         <div className="bk-logo">{salon.name}</div>
         <div className="bk-success-card">
           <div className="bk-success-icon">✓</div>
-          <h2>Programare confirmată!</h2>
+          <h2>Cerere trimisă!</h2>
+          <p className="bk-success-subtitle">
+            Programarea ta a fost înregistrată și urmează să fie confirmată de salon.
+            {clientEmail.trim() && <> Vei primi un email de confirmare la <strong>{clientEmail.trim()}</strong>.</>}
+          </p>
           <div className="bk-success-details">
             <div className="bk-success-row">
               <span>Serviciu</span><span>{selectedService.name}</span>
@@ -151,7 +157,13 @@ export default function BookingScreen() {
           <p className="bk-success-note">
             Te așteptăm la {salon.name}!
             {salon.address && <><br />{salon.address}, {salon.city}</>}
+            {salon.phone && <><br />📞 {salon.phone}</>}
           </p>
+          {salon.phone && (
+            <p className="bk-success-cancel">
+              Dacă dorești să anulezi, sună la <strong>{salon.phone}</strong>
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -225,7 +237,11 @@ export default function BookingScreen() {
           <>
             <h2 className="bk-card-title">Alege stilistul</h2>
             <div className="bk-employee-grid">
-              {salon.employees?.map((emp, i) => (
+              {(salon.employees || [])
+                .filter(emp =>
+                  !emp.services?.length || emp.services.includes(selectedService.name)
+                )
+                .map((emp, i) => (
                 <button
                   key={i}
                   className={`bk-employee-card ${selectedEmployee?.name === emp.name ? 'selected' : ''}`}
@@ -235,7 +251,7 @@ export default function BookingScreen() {
                   <span className="bk-emp-name">{emp.name}</span>
                   {emp.role && <span className="bk-emp-role">{emp.role}</span>}
                 </button>
-              ))}
+                ))}
             </div>
             <div className="bk-actions">
               <button className="bk-btn-back" onClick={goBack}>← Înapoi</button>
@@ -350,6 +366,16 @@ export default function BookingScreen() {
                   value={clientPhone}
                   onChange={e => setClientPhone(e.target.value)}
                   maxLength={15}
+                />
+              </div>
+              <div className="bk-field">
+                <label>Email (pentru confirmare)</label>
+                <input
+                  type="email"
+                  placeholder="ioana@email.ro"
+                  value={clientEmail}
+                  onChange={e => setClientEmail(e.target.value)}
+                  maxLength={80}
                 />
               </div>
             </div>

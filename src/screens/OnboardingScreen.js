@@ -245,7 +245,7 @@ export default function OnboardingScreen() {
             <h2 className="ob-card-title">Echipa ta</h2>
             <div className="ob-list">
               {employees.map((emp, i) => (
-                <div key={i} className="ob-list-item">
+                <div key={i} className="ob-list-item ob-list-item-col">
                   <div className="ob-list-item-fields">
                     <div className="ob-field ob-field-grow">
                       <label>Nume *</label>
@@ -266,8 +266,37 @@ export default function OnboardingScreen() {
                       />
                     </div>
                   </div>
+
+                  {/* Servicii asignate */}
+                  {services.filter(s => s.name.trim()).length > 0 && (
+                    <div className="ob-services-assign">
+                      <div className="ob-services-assign-label">Servicii oferite</div>
+                      <div className="ob-services-assign-grid">
+                        {services.filter(s => s.name.trim()).map((svc, j) => {
+                          const checked = emp.services?.includes(svc.name) || false;
+                          return (
+                            <button
+                              key={j}
+                              type="button"
+                              className={`ob-svc-chip ${checked ? 'selected' : ''}`}
+                              onClick={() => {
+                                const current = emp.services || [];
+                                const updated = checked
+                                  ? current.filter(s => s !== svc.name)
+                                  : [...current, svc.name];
+                                updateEmployee(i, 'services', updated);
+                              }}
+                            >
+                              {checked ? '✓ ' : ''}{svc.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {employees.length > 1 && (
-                    <button className="ob-remove" onClick={() => removeEmployee(i)}>✕</button>
+                    <button className="ob-remove ob-remove-standalone" onClick={() => removeEmployee(i)}>✕ Șterge</button>
                   )}
                 </div>
               ))}

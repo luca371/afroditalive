@@ -4,11 +4,12 @@ import {
   collection, query, where, onSnapshot,
   doc, updateDoc
 } from 'firebase/firestore';
+import emailjs from '@emailjs/browser';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import './DashboardScreen.css';
 
-const VIEWS = ['Azi', 'Săptămână', 'Setări'];
+const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Setări'];
 
 export default function DashboardScreen() {
   const { user, salon, setSalon, logout } = useAuth();
@@ -41,6 +42,43 @@ export default function DashboardScreen() {
 
   async function handleStatus(bookingId, status) {
     await updateDoc(doc(db, 'bookings', bookingId), { status });
+
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking?.clientEmail) return;
+
+    const serviceId  = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+    const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+    const publicKey  = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+    if (!serviceId || !templateId || !publicKey) return;
+
+    const messages = {
+      confirmed: 'Programarea ta a fost confirmată de salon. Te așteptăm!',
+      cancelled: 'Din păcate, programarea ta a fost anulată de salon. Te rugăm să contactezi salonul pentru a reprograma.',
+    };
+
+    if (!messages[status]) return;
+
+    try {
+      await emailjs.send(serviceId, templateId, {
+        name:          booking.clientName,
+        email:         booking.clientEmail,
+        time:          booking.timeSlot,
+        message:       messages[status],
+        client_name:   booking.clientName,
+        client_email:  booking.clientEmail,
+        salon_name:    salon?.name || '',
+        service_name:  booking.serviceName,
+        employee_name: booking.employeeName,
+        date:          formatDateFromStr(booking.date),
+        time_slot:     booking.timeSlot,
+        duration:      booking.duration,
+        price:         booking.price || '',
+        address:       salon?.address ? `${salon.address}, ${salon.city}` : '',
+        phone:         salon?.phone || '',
+      }, publicKey);
+    } catch {
+      console.warn('Email nu a putut fi trimis.');
+    }
   }
 
   async function handleLogout() {
@@ -109,9 +147,10 @@ export default function DashboardScreen() {
               className={`db-nav-item ${view === v ? 'active' : ''}`}
               onClick={() => { setView(v); setMenuOpen(false); }}
             >
-              {v === 'Azi'       && <IconToday />}
-              {v === 'Săptămână' && <IconCalendar />}
-              {v === 'Setări'    && <IconSettings />}
+              {v === 'Azi'        && <IconToday />}
+              {v === 'Programări' && <IconList />}
+              {v === 'Săptămână'  && <IconCalendar />}
+              {v === 'Setări'     && <IconSettings />}
               {v}
             </button>
           ))}
@@ -137,23 +176,17 @@ export default function DashboardScreen() {
             <span /><span /><span />
           </button>
           <div className="db-header-title">
-            {view === 'Azi' && (
+            {view === 'Azi'        && (
               <>
                 <h1>Programările de azi</h1>
                 <span>{formatDate(new Date())}</span>
               </>
             )}
-            {view === 'Săptămână' && <h1>Calendar săptămânal</h1>}
-            {view === 'Setări'    && <h1>Setări salon</h1>}
+            {view === 'Programări' && <h1>Toate programările</h1>}
+            {view === 'Săptămână'  && <h1>Calendar săptămânal</h1>}
+            {view === 'Setări'     && <h1>Setări salon</h1>}
           </div>
-          <a
-            href={`/book/${salon?.slug || ''}`}
-            target="_blank"
-            rel="noreferrer"
-            className="db-booking-link"
-          >
-            Link booking →
-          </a>
+          <CopyLinkButton slug={salon?.slug} />
         </header>
 
         {/* ── VIEW: AZI ── */}
@@ -230,6 +263,11 @@ export default function DashboardScreen() {
               </div>
             )}
           </div>
+        )}
+
+        {/* ── VIEW: TOATE PROGRAMĂRILE ── */}
+        {view === 'Programări' && (
+          <AllBookingsView bookings={bookings} onStatus={handleStatus} />
         )}
 
         {/* ── VIEW: SĂPTĂMÂNĂ ── */}
@@ -462,7 +500,7 @@ function SettingsView({ user, salon, setSalon, navigate }) {
             <>
               <div className="db-set-list">
                 {employees.map((e, i) => (
-                  <div key={i} className="db-set-list-item">
+                  <div key={i} className="db-set-list-item db-set-list-item-col">
                     <div className="db-set-list-fields">
                       <div className="db-set-field db-set-field-grow">
                         <label>Nume</label>
@@ -473,8 +511,37 @@ function SettingsView({ user, salon, setSalon, navigate }) {
                         <input value={e.role} onChange={ev => updateEmp(i, 'role', ev.target.value)} placeholder="ex. Stilist" />
                       </div>
                     </div>
+
+                    {/* Servicii asignate */}
+                    {services.filter(s => s.name.trim()).length > 0 && (
+                      <div className="db-set-svc-assign">
+                        <div className="db-set-svc-label">Servicii oferite</div>
+                        <div className="db-set-svc-grid">
+                          {services.filter(s => s.name.trim()).map((svc, j) => {
+                            const checked = e.services?.includes(svc.name) || false;
+                            return (
+                              <button
+                                key={j}
+                                type="button"
+                                className={`db-set-svc-chip ${checked ? 'selected' : ''}`}
+                                onClick={() => {
+                                  const current = e.services || [];
+                                  const updated = checked
+                                    ? current.filter(s => s !== svc.name)
+                                    : [...current, svc.name];
+                                  updateEmp(i, 'services', updated);
+                                }}
+                              >
+                                {checked ? '✓ ' : ''}{svc.name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     {employees.length > 1 && (
-                      <button className="db-set-remove" onClick={() => removeEmp(i)}>✕</button>
+                      <button className="db-set-remove db-set-remove-text" onClick={() => removeEmp(i)}>✕ Șterge angajat</button>
                     )}
                   </div>
                 ))}
@@ -527,12 +594,183 @@ function SettingsView({ user, salon, setSalon, navigate }) {
   );
 }
 
-// ── Helpers ──
+function AllBookingsView({ bookings, onStatus }) {
+  const [filter, setFilter]   = useState('toate');
+  const [search, setSearch]   = useState('');
+  const [sortDir, setSortDir] = useState('desc');
+
+  const statusLabel = { confirmed: 'Confirmat', pending: 'În așteptare', cancelled: 'Anulat' };
+  const statusClass = { confirmed: 'db-status-confirmed', pending: 'db-status-pending', cancelled: 'db-status-cancelled' };
+
+  const filtered = bookings
+    .filter(b => {
+      if (filter === 'confirmed') return b.status === 'confirmed';
+      if (filter === 'pending')   return b.status === 'pending';
+      if (filter === 'cancelled') return b.status === 'cancelled';
+      return true;
+    })
+    .filter(b => {
+      if (!search.trim()) return true;
+      const s = search.toLowerCase();
+      return (
+        b.clientName?.toLowerCase().includes(s) ||
+        b.serviceName?.toLowerCase().includes(s) ||
+        b.employeeName?.toLowerCase().includes(s) ||
+        b.clientPhone?.includes(s) ||
+        b.clientEmail?.toLowerCase().includes(s) ||
+        b.date?.includes(s)
+      );
+    })
+    .sort((a, b) => {
+      const cmp = a.date !== b.date
+        ? a.date.localeCompare(b.date)
+        : (a.timeSlot || '').localeCompare(b.timeSlot || '');
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+
+  return (
+    <div className="db-content">
+      {/* Toolbar */}
+      <div className="db-all-toolbar">
+        <div className="db-all-filters">
+          {[
+            { id: 'toate',     label: `Toate (${bookings.length})` },
+            { id: 'pending',   label: `În așteptare (${bookings.filter(b => b.status === 'pending').length})` },
+            { id: 'confirmed', label: `Confirmate (${bookings.filter(b => b.status === 'confirmed').length})` },
+            { id: 'cancelled', label: `Anulate (${bookings.filter(b => b.status === 'cancelled').length})` },
+          ].map(f => (
+            <button
+              key={f.id}
+              className={`db-all-filter ${filter === f.id ? 'active' : ''}`}
+              onClick={() => setFilter(f.id)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="db-all-right">
+          <input
+            className="db-all-search"
+            type="text"
+            placeholder="Caută client, serviciu, telefon..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <button
+            className="db-all-sort"
+            onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+          >
+            {sortDir === 'desc' ? '↓ Cele mai noi' : '↑ Cele mai vechi'}
+          </button>
+        </div>
+      </div>
+
+      {/* Table */}
+      {filtered.length === 0 ? (
+        <div className="db-empty">
+          <div className="db-empty-icon">◎</div>
+          <p>Nicio programare găsită.</p>
+        </div>
+      ) : (
+        <div className="db-all-table">
+          <div className="db-all-thead">
+            <span>Data & Ora</span>
+            <span>Client</span>
+            <span>Serviciu</span>
+            <span>Stilist</span>
+            <span>Contact</span>
+            <span>Status</span>
+            <span>Acțiuni</span>
+          </div>
+          {filtered.map(b => (
+            <div key={b.id} className={`db-all-row ${b.status === 'cancelled' ? 'cancelled' : ''}`}>
+              <div className="db-all-cell db-all-date">
+                <span className="db-all-date-day">{formatDateShort(b.date)}</span>
+                <span className="db-all-date-time">{b.timeSlot}</span>
+              </div>
+              <div className="db-all-cell">
+                <span className="db-all-primary">{b.clientName}</span>
+              </div>
+              <div className="db-all-cell">
+                <span className="db-all-primary">{b.serviceName}</span>
+                <span className="db-all-secondary">{b.duration} min{b.price ? ` · ${b.price} lei` : ''}</span>
+              </div>
+              <div className="db-all-cell">
+                <span className="db-all-primary">{b.employeeName}</span>
+              </div>
+              <div className="db-all-cell">
+                {b.clientPhone && <span className="db-all-secondary">{b.clientPhone}</span>}
+                {b.clientEmail && <span className="db-all-secondary">{b.clientEmail}</span>}
+              </div>
+              <div className="db-all-cell">
+                <span className={`db-status ${statusClass[b.status]}`}>
+                  {statusLabel[b.status]}
+                </span>
+              </div>
+              <div className="db-all-cell db-all-actions">
+                {b.status === 'pending' && (
+                  <button className="db-btn-confirm" onClick={() => onStatus(b.id, 'confirmed')}>
+                    Confirmă
+                  </button>
+                )}
+                {b.status !== 'cancelled' && (
+                  <button className="db-btn-cancel" onClick={() => onStatus(b.id, 'cancelled')}>
+                    Anulează
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatDateShort(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── Copy Link Button ──
+function CopyLinkButton({ slug }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    const url = `${window.location.origin}/book/${slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <button className={`db-copy-btn ${copied ? 'copied' : ''}`} onClick={handleCopy}>
+      {copied ? '✓ Copiat!' : 'Copiază link booking'}
+    </button>
+  );
+}
+
+
+function formatDateFromStr(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
 function formatDate(d) {
   return d.toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 // ── Icons ──
+function IconList() {
+  return (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+    </svg>
+  );
+}
 function IconToday() {
   return (
     <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">

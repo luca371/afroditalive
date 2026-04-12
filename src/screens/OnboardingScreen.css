@@ -168,7 +168,7 @@
   border-color: rgba(201,168,124,0.45);
   background: rgba(250,247,242,0.07);
 }
-.ob-field input[type="number"] { -moz-appearance: textfield; appearance: textfield;}
+.ob-field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .ob-field input[type="number"]::-webkit-outer-spin-button,
 .ob-field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 .ob-field input[type="time"] {
@@ -219,6 +219,57 @@
   color: rgba(240,100,100,0.7);
 }
 
+.ob-list-item-col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.ob-services-assign { display: flex; flex-direction: column; gap: 10px; }
+.ob-services-assign-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(250,247,242,0.4);
+  font-weight: 500;
+}
+.ob-services-assign-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ob-svc-chip {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(250,247,242,0.5);
+  background: rgba(250,247,242,0.04);
+  border: 1px solid rgba(201,168,124,0.15);
+  border-radius: 100px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.ob-svc-chip:hover {
+  border-color: rgba(201,168,124,0.35);
+  color: rgba(250,247,242,0.8);
+}
+.ob-svc-chip.selected {
+  background: rgba(201,168,124,0.15);
+  border-color: rgba(201,168,124,0.5);
+  color: var(--rose);
+  font-weight: 500;
+}
+
+.ob-remove-standalone {
+  width: auto !important;
+  align-self: flex-start;
+  height: auto !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  color: rgba(250,247,242,0.25) !important;
+}
 .ob-add {
   font-family: var(--sans);
   font-size: 13px;
