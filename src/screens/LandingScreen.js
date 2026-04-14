@@ -383,18 +383,18 @@ export default function LandingScreen() {
               cta: 'Începe gratuit', featured: false,
             },
             {
-              name: 'Starter', price: '49', period: 'Facturare lunară',
+              name: 'Starter', price: '15', period: 'Facturare lunară',
               features: ['3 angajați', 'Programări nelimitate', 'Calendar săptămânal', 'Confirmare/anulare din dashboard'],
               cta: 'Alege Starter', featured: false,
             },
             {
-              name: 'Pro', price: '99', period: 'Facturare lunară',
-              features: ['10 angajați', 'Programări nelimitate', 'SMS reminders automate', 'Statistici avansate', 'Prioritate la suport'],
+              name: 'Pro', price: '45', period: 'Facturare lunară',
+              features: ['10 angajați', 'Programări nelimitate', 'Email confirmări automate', 'Statistici avansate', 'Prioritate la suport'],
               cta: 'Alege Pro', featured: true, badge: 'Cel mai ales',
             },
             {
-              name: 'Business', price: '199', period: 'Facturare lunară',
-              features: ['Angajați nelimitați', 'Mai multe locații', 'SMS reminders incluse', 'Onboarding dedicat', 'Integrare site propriu'],
+              name: 'Business', price: '99', period: 'Facturare lunară',
+              features: ['Angajați nelimitați', 'Mai multe locații', 'Email confirmări incluse', 'Onboarding dedicat', 'Integrare site propriu'],
               cta: 'Alege Business', featured: false,
             },
           ].map((plan, i) => (

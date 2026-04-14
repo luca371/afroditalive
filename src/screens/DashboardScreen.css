@@ -750,6 +750,22 @@
 .db-save-btn:hover:not(:disabled) { background: var(--rose-light); transform: translateY(-1px); }
 .db-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+.db-plan-limit-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(201,168,124,0.08);
+  border: 1px solid rgba(201,168,124,0.25);
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: rgba(250,247,242,0.6);
+  flex-wrap: wrap;
+}
+.db-plan-limit-banner strong { color: var(--rose); font-weight: 500; }
+
 /* Plan & upgrade */
 .db-plan-badge {
   font-size: 11px;
@@ -847,6 +863,15 @@
   .db-all-search { width: 100%; }
   .db-all-toolbar { flex-direction: column; align-items: stretch; }
   .db-all-right { flex-direction: column; }
+}
+
+.db-upgrade-success {
+  background: rgba(39,201,63,0.1);
+  border-bottom: 1px solid rgba(39,201,63,0.2);
+  padding: 12px 40px;
+  font-size: 14px;
+  color: #5de07a;
+  text-align: center;
 }
 
 /* ── OVERLAY MOBILE ── */

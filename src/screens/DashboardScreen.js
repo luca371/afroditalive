@@ -7,6 +7,8 @@ import {
 import emailjs from '@emailjs/browser';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
+import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
+import UpgradeModal from '../components/UpgradeModal';
 import './DashboardScreen.css';
 
 const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Setări'];
@@ -19,6 +21,7 @@ export default function DashboardScreen() {
   const [bookings, setBookings]   = useState([]);
   const [loading, setLoading]     = useState(true);
   const [menuOpen, setMenuOpen]   = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   // Fetch bookings in real-time
   useEffect(() => {
@@ -189,6 +192,13 @@ export default function DashboardScreen() {
           <CopyLinkButton slug={salon?.slug} />
         </header>
 
+        {/* Banner upgrade success */}
+        {window.location.search.includes('upgrade=success') && (
+          <div className="db-upgrade-success">
+            🎉 Planul tău a fost upgrades cu succes! Mulțumim.
+          </div>
+        )}
+
         {/* ── VIEW: AZI ── */}
         {view === 'Azi' && (
           <div className="db-content">
@@ -333,12 +343,15 @@ export default function DashboardScreen() {
 
         {/* ── VIEW: SETĂRI ── */}
         {view === 'Setări' && (
-          <SettingsView user={user} salon={salon} setSalon={setSalon} navigate={navigate} />
+          <SettingsView user={user} salon={salon} setSalon={setSalon} navigate={navigate} onUpgrade={() => setShowUpgrade(true)} />
         )}
       </main>
 
       {/* Overlay mobile */}
       {menuOpen && <div className="db-overlay" onClick={() => setMenuOpen(false)} />}
+
+      {/* Upgrade modal */}
+      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
     </div>
   );
 }
@@ -346,7 +359,7 @@ export default function DashboardScreen() {
 // ── Settings View ──
 const DAYS = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'];
 
-function SettingsView({ user, salon, setSalon, navigate }) {
+function SettingsView({ user, salon, setSalon, navigate, onUpgrade }) {
   const [tab, setTab]       = useState('info');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
@@ -395,7 +408,15 @@ function SettingsView({ user, salon, setSalon, navigate }) {
   const addSvc     = ()        => setServices(p  => [...p, { name: '', duration: 60, price: '' }]);
   const removeSvc  = (i)       => setServices(p  => p.filter((_, idx) => idx !== i));
   const updateEmp  = (i, f, v) => setEmployees(p => p.map((e, idx) => idx === i ? { ...e, [f]: v } : e));
-  const addEmp     = ()        => setEmployees(p => [...p, { name: '', role: '' }]);
+  const addEmp     = () => {
+    const plan = salon?.plan || 'free';
+    if (!canAddEmployee(plan, employees.length)) {
+      const limits = getPlanLimits(plan);
+      setError(`Planul ${plan} permite maxim ${limits.maxEmployees} angajat${limits.maxEmployees > 1 ? 'i' : ''}. Upgrade pentru mai mulți.`);
+      return;
+    }
+    setEmployees(p => [...p, { name: '', role: '' }]);
+  };
   const removeEmp  = (i)       => setEmployees(p => p.filter((_, idx) => idx !== i));
   const toggleDay  = (d)       => setSchedule(p  => ({ ...p, [d]: { ...p[d], open: !p[d].open } }));
   const updateHour = (d, f, v) => setSchedule(p  => ({ ...p, [d]: { ...p[d], [f]: v } }));
@@ -420,7 +441,7 @@ function SettingsView({ user, salon, setSalon, navigate }) {
               /book/{salon?.slug}
             </a>
           </div>
-          <button className="db-upgrade-btn" onClick={() => navigate('/#pricing')}>
+          <button className="db-upgrade-btn" onClick={onUpgrade}>
             Upgrade →
           </button>
         </div>
@@ -498,6 +519,23 @@ function SettingsView({ user, salon, setSalon, navigate }) {
           {/* ANGAJAȚI */}
           {tab === 'angajati' && (
             <>
+              {/* Banner limită plan */}
+              {(() => {
+                const plan = salon?.plan || 'free';
+                const limits = getPlanLimits(plan);
+                const atLimit = employees.length >= limits.maxEmployees;
+                if (!atLimit) return null;
+                return (
+                  <div className="db-plan-limit-banner">
+                    <span>
+                      Ai atins limita de <strong>{limits.maxEmployees} angajat{limits.maxEmployees > 1 ? 'i' : ''}</strong> pentru planul <strong>{plan}</strong>.
+                    </span>
+                    <button className="db-upgrade-btn" onClick={onUpgrade}>
+                      Upgrade →
+                    </button>
+                  </div>
+                );
+              })()}
               <div className="db-set-list">
                 {employees.map((e, i) => (
                   <div key={i} className="db-set-list-item db-set-list-item-col">

@@ -86,6 +86,28 @@ export default function BookingScreen() {
     }
     setSubmitting(true); setError('');
     try {
+      // Verifică limita de programări/lună pentru planul Free
+      const { canAddBooking } = await import('../utils/planLimits');
+      const plan = salon.plan || 'free';
+      if (plan === 'free') {
+        const now = new Date();
+        const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        const lastOfMonth  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        const q = query(
+          collection(db, 'bookings'),
+          where('salonId', '==', salon.id),
+          where('date', '>=', firstOfMonth),
+          where('date', '<=', lastOfMonth)
+        );
+        const snap = await getDocs(q);
+        const countThisMonth = snap.docs.filter(d => d.data().status !== 'cancelled').length;
+        if (!canAddBooking(plan, countThisMonth)) {
+          setError('Salonul a atins limita de 30 programări/lună pentru planul Free. Revino luna viitoare sau contactează salonul direct.');
+          setSubmitting(false);
+          return;
+        }
+      }
+
       await addDoc(collection(db, 'bookings'), {
         salonId:      salon.id,
         clientName:   clientName.trim(),

@@ -6,6 +6,7 @@ import OnboardingScreen from './screens/OnboardingScreen';
 import DashboardScreen  from './screens/DashboardScreen';
 import BookingScreen    from './screens/BookingScreen';
 import ProtectedRoute   from './components/ProtectedRoute';
+import PublicRoute      from './components/PublicRoute';
 
 export default function App() {
   return (
@@ -13,9 +14,15 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/"                element={<LandingScreen />} />
-        <Route path="/register"        element={<RegisterScreen />} />
-        <Route path="/login"           element={<LoginScreen />} />
         <Route path="/book/:salonSlug" element={<BookingScreen />} />
+
+        {/* Doar pentru neautentificați */}
+        <Route path="/login" element={
+          <PublicRoute><LoginScreen /></PublicRoute>
+        }/>
+        <Route path="/register" element={
+          <PublicRoute><RegisterScreen /></PublicRoute>
+        }/>
 
         {/* Protejate */}
         <Route path="/onboarding" element={

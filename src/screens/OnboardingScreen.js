@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
+import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
 import './OnboardingScreen.css';
 
 const STEPS = ['Salon', 'Servicii', 'Angajați', 'Program'];
@@ -15,7 +16,7 @@ const DEFAULT_SCHEDULE = DAYS.reduce((acc, day) => ({
 }), {});
 
 export default function OnboardingScreen() {
-  const { user, setSalon } = useAuth();
+  const { user, salon, setSalon } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep]       = useState(0);
@@ -98,6 +99,12 @@ export default function OnboardingScreen() {
     setEmployees(prev => prev.map((e, idx) => idx === i ? { ...e, [field]: val } : e));
   }
   function addEmployee() {
+    const plan = salon?.plan || 'free';
+    if (!canAddEmployee(plan, employees.length)) {
+      const limits = getPlanLimits(plan);
+      setError(`Planul ${plan} permite maxim ${limits.maxEmployees} angajat${limits.maxEmployees > 1 ? 'i' : ''}. Upgrade pentru mai mulți.`);
+      return;
+    }
     setEmployees(prev => [...prev, { name: '', role: '' }]);
   }
   function removeEmployee(i) {
