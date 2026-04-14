@@ -1,6 +1,12 @@
 const Stripe = require('stripe');
 const admin  = require('firebase-admin');
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 // Inițializează Firebase Admin doar o dată
 if (!admin.apps.length) {
   admin.initializeApp({
