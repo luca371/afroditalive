@@ -95,12 +95,13 @@ export default function BookingScreen() {
         const lastOfMonth  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
         const q = query(
           collection(db, 'bookings'),
-          where('salonId', '==', salon.id),
-          where('date', '>=', firstOfMonth),
-          where('date', '<=', lastOfMonth)
+          where('salonId', '==', salon.id)
         );
         const snap = await getDocs(q);
-        const countThisMonth = snap.docs.filter(d => d.data().status !== 'cancelled').length;
+        const countThisMonth = snap.docs
+          .map(d => d.data())
+          .filter(b => b.status !== 'cancelled' && b.date >= firstOfMonth && b.date <= lastOfMonth)
+          .length;
         if (!canAddBooking(plan, countThisMonth)) {
           setError('Salonul a atins limita de 30 programări/lună pentru planul Free. Revino luna viitoare sau contactează salonul direct.');
           setSubmitting(false);
