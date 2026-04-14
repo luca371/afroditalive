@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import {
   collection, query, where, getDocs, addDoc
 } from 'firebase/firestore';
+import { canAddBooking } from '../utils/planLimits';
 import { db } from '../firebase';
 import './BookingScreen.css';
 
@@ -87,7 +88,6 @@ export default function BookingScreen() {
     setSubmitting(true); setError('');
     try {
       // Verifică limita de programări/lună pentru planul Free
-      const { canAddBooking } = await import('../utils/planLimits');
       const plan = salon.plan || 'free';
       if (plan === 'free') {
         const now = new Date();
