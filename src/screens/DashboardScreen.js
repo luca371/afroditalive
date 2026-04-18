@@ -26,6 +26,8 @@ export default function DashboardScreen() {
   const [loading, setLoading]     = useState(true);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [dragInfo, setDragInfo]   = useState(null);
+  const [dropTarget, setDropTarget] = useState(null);
 
   // Fetch bookings in real-time
   useEffect(() => {
@@ -117,6 +119,87 @@ export default function DashboardScreen() {
       } catch {
         console.warn('SMS nu a putut fi trimis.');
       }
+    }
+  }
+
+  async function handleDrop(booking, newDate, newHour) {
+    if (!booking || !newDate || !newHour) return;
+    const newTimeSlot = newHour; // e.g. "14:00"
+
+    // Dacă e aceeași dată și oră — nu facem nimic
+    if (booking.date === newDate && booking.timeSlot === newTimeSlot) return;
+
+    try {
+      // Actualizează în Firestore
+      await updateDoc(doc(db, 'bookings', booking.id), {
+        date:     newDate,
+        timeSlot: newTimeSlot,
+        movedAt:  new Date().toISOString(),
+        movedBy:  'admin',
+      });
+
+      const oldDateFormatted = formatDateFromStr(booking.date);
+      const newDateFormatted = formatDateFromStr(newDate);
+
+      // Trimite email
+      const serviceId  = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+      const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+      const publicKey  = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+
+      if (serviceId && templateId && publicKey && booking.clientEmail) {
+        const cancelUrl = `${window.location.origin}/cancel/${booking.id}`;
+        try {
+          await emailjs.send(serviceId, templateId, {
+            name:          booking.clientName,
+            email:         booking.clientEmail,
+            time:          newTimeSlot,
+            message:       `Programarea ta a fost reprogramată. Noua dată: ${newDateFormatted} la ${newTimeSlot} (anterior: ${oldDateFormatted} la ${booking.timeSlot}).`,
+            status:        'Reprogramat',
+            messagecancel: 'Dacă dorești să anulezi programarea, apasă aici:',
+            client_name:   booking.clientName,
+            client_email:  booking.clientEmail,
+            salon_name:    salon?.name || '',
+            service_name:  booking.serviceName,
+            employee_name: booking.employeeName,
+            date:          newDateFormatted,
+            time_slot:     newTimeSlot,
+            duration:      booking.duration,
+            price:         booking.price || '',
+            address:       salon?.address ? `${salon.address}, ${salon.city}` : '',
+            phone:         salon?.phone || '',
+            cancel_url:    cancelUrl,
+          }, publicKey);
+        } catch {
+          console.warn('Email reprogramare nu a putut fi trimis.');
+        }
+      }
+
+      // Trimite SMS
+      if (booking.clientPhone) {
+        try {
+          await fetch('/api/send-sms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone:        booking.clientPhone,
+              serviceName:  booking.serviceName,
+              employeeName: booking.employeeName,
+              date:         newDateFormatted,
+              timeSlot:     newTimeSlot,
+              status:       'rescheduled',
+              cancelUrl:    `${window.location.origin}/cancel/${booking.id}`,
+              salonName:    salon?.name || '',
+              oldDate:      oldDateFormatted,
+              oldTimeSlot:  booking.timeSlot,
+            }),
+          });
+        } catch {
+          console.warn('SMS reprogramare nu a putut fi trimis.');
+        }
+      }
+
+    } catch (err) {
+      console.error('Eroare la mutare programare:', err);
     }
   }
 
@@ -330,6 +413,12 @@ export default function DashboardScreen() {
                 <button onClick={() => setWeekOffset(o => o + 1)}>Următor ›</button>
               </div>
 
+              {dragInfo && (
+                <div className="db-cal-drag-hint">
+                  Muți programarea lui <strong>{dragInfo.clientName}</strong> — trage pe noua oră
+                </div>
+              )}
+
               {/* Header zile */}
               <div className="db-cal-header">
                 <div className="db-cal-time-col" />
@@ -350,16 +439,35 @@ export default function DashboardScreen() {
                   <div key={hour} className="db-cal-row">
                     <div className="db-cal-time">{hour}</div>
                     {weekDays.map((d, i) => {
+                      const dateStr = d.toISOString().split('T')[0];
                       const dayBookings = bookingsForDay(d).filter(b =>
                         b.timeSlot && b.timeSlot.startsWith(hour.substring(0, 2))
                       );
+                      const isDropTarget = dragInfo && dropTarget?.date === dateStr && dropTarget?.hour === hour;
                       return (
-                        <div key={i} className="db-cal-cell">
+                        <div
+                          key={i}
+                          className={`db-cal-cell ${isDropTarget ? 'db-cal-drop-target' : ''}`}
+                          onDragOver={e => {
+                            e.preventDefault();
+                            setDropTarget({ date: dateStr, hour });
+                          }}
+                          onDragLeave={() => setDropTarget(null)}
+                          onDrop={e => {
+                            e.preventDefault();
+                            if (dragInfo) handleDrop(dragInfo, dateStr, hour);
+                            setDropTarget(null);
+                            setDragInfo(null);
+                          }}
+                        >
                           {dayBookings.map(b => (
                             <div
                               key={b.id}
-                              className={`db-cal-event ${statusClass[b.status]}`}
+                              className={`db-cal-event ${statusClass[b.status]} ${b.status !== 'cancelled' ? 'db-cal-event-draggable' : ''} ${dragInfo?.id === b.id ? 'db-cal-event-dragging' : ''}`}
                               title={`${b.clientName} · ${b.serviceName}`}
+                              draggable={b.status !== 'cancelled'}
+                              onDragStart={() => b.status !== 'cancelled' && setDragInfo(b)}
+                              onDragEnd={() => { setDragInfo(null); setDropTarget(null); }}
                             >
                               <span className="db-cal-event-time">{b.timeSlot}</span>
                               <span className="db-cal-event-name">{b.clientName}</span>

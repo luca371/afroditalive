@@ -13,8 +13,9 @@ module.exports = async (req, res) => {
   if (!phone) return res.status(400).json({ error: 'Phone is required' });
 
   const messages = {
-    confirmed: `${salonName || 'Salon'}: Programarea ta a fost confirmată! ${serviceName} cu ${employeeName}, ${date} la ${timeSlot}. Anulează: ${cancelUrl}`,
-    cancelled:  `${salonName || 'Salon'}: Programarea ta din ${date} la ${timeSlot} a fost anulată. Contactează-ne pentru reprogramare.`,
+    confirmed:   `${salonName || 'Salon'}: Programarea ta a fost confirmată! ${serviceName} cu ${employeeName}, ${date} la ${timeSlot}. Anulează: ${cancelUrl}`,
+    cancelled:   `${salonName || 'Salon'}: Programarea ta din ${date} la ${timeSlot} a fost anulată. Contactează-ne pentru reprogramare.`,
+    rescheduled: `${salonName || 'Salon'}: Programarea ta a fost reprogramată. Noua dată: ${date} la ${timeSlot} (${serviceName} cu ${employeeName}). Anulează: ${cancelUrl}`,
   };
 
   const body = messages[status];
