@@ -6,7 +6,7 @@ import './WelcomeTour.css';
 const STEPS = [
   {
     target:  null, // fullscreen overlay
-    title:   'Bun venit în Afrodita! 🎉',
+    title:   'Bun venit în Afrodita!',
     desc:    'Ești la un pas de primul booking online. Îți arătăm rapid cum funcționează — durează mai puțin de 2 minute.',
     cta:     'Hai să începem',
     icon:    '✦',
@@ -16,7 +16,7 @@ const STEPS = [
     title:   'Azi — centrul tău de comandă',
     desc:    'Aici vezi toate programările din ziua curentă, câte sunt confirmate și câte în așteptare.',
     cta:     'Înțeles',
-    icon:    '📅',
+    icon:    '',
     position: 'right',
   },
   {
@@ -32,7 +32,7 @@ const STEPS = [
     title:   'Statistici & Insights',
     desc:    'Grafice cu evoluția programărilor, top servicii, top angajați și insight-uri despre ora și ziua cea mai aglomerată.',
     cta:     'Înțeles',
-    icon:    '📊',
+    icon:    '',
     position: 'right',
   },
   {
@@ -40,7 +40,7 @@ const STEPS = [
     title:   'Linkul tău de booking',
     desc:    'Acesta este linkul pe care îl dai clienților — pune-l pe Instagram, WhatsApp, Google sau site-ul tău. Clienții se programează singuri.',
     cta:     'Înțeles',
-    icon:    '🔗',
+    icon:    '',
     position: 'bottom',
   },
   {
@@ -48,7 +48,7 @@ const STEPS = [
     title:   'Configurează salonul',
     desc:    'Adaugă serviciile, angajații cu programul lor și orele de lucru. Cu cât e mai complet, cu atât booking-ul e mai precis.',
     cta:     'Înțeles',
-    icon:    '⚙️',
+    icon:    '',
     position: 'right',
   },
   {
@@ -56,7 +56,7 @@ const STEPS = [
     title:   'Ești gata!',
     desc:    'Copiază linkul de booking și trimite-l primilor tăi clienți. Primul booking online e la un pas distanță.',
     cta:     'Să începem!',
-    icon:    '🚀',
+    icon:    '',
   },
 ];
 
