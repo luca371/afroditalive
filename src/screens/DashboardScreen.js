@@ -60,8 +60,8 @@ export default function DashboardScreen() {
     };
 
     const statuses = {
-      confirmed: 'Confirmare',
-      cancelled: 'Anulare',
+      confirmed: 'Confirmat',
+      cancelled: 'Anulat',
     };
 
     if (!messages[status]) return;
@@ -83,7 +83,7 @@ export default function DashboardScreen() {
         duration:      booking.duration,
         price:         booking.price || '',
         address:       salon?.address ? `${salon.address}, ${salon.city}` : '',
-        phone:         salon?.phone || '',
+        cancel_url:    `${window.location.origin}/cancel/${bookingId}`,
       }, publicKey);
     } catch {
       console.warn('Email nu a putut fi trimis.');

@@ -1,0 +1,187 @@
+:root {
+  --espresso-deep: #1a0e09;
+  --espresso-mid:  #3d2318;
+  --rose:          #C9A87C;
+  --rose-light:    #dfc9a5;
+  --offwhite:      #FAF7F2;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.cb-page {
+  min-height: 100vh;
+  background: var(--espresso-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: var(--sans);
+  color: var(--offwhite);
+  position: relative;
+}
+.cb-page::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(201,168,124,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cb-loading {
+  font-size: 14px;
+  color: rgba(250,247,242,0.3);
+  letter-spacing: 0.1em;
+}
+
+.cb-logo {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--rose);
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.cb-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(61,35,24,0.35);
+  border: 1px solid rgba(201,168,124,0.15);
+  border-radius: 10px;
+  padding: 48px 40px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.4s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cb-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 22px;
+  font-weight: 300;
+}
+.cb-icon-warn {
+  background: rgba(201,168,124,0.12);
+  border: 1px solid rgba(201,168,124,0.3);
+  color: var(--rose);
+}
+.cb-icon-ok {
+  background: rgba(39,201,63,0.12);
+  border: 1px solid rgba(39,201,63,0.3);
+  color: #5de07a;
+}
+.cb-icon-error {
+  background: rgba(240,100,100,0.1);
+  border: 1px solid rgba(240,100,100,0.3);
+  color: #f07a7a;
+}
+
+.cb-card h2 {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--offwhite);
+  margin-bottom: 10px;
+}
+.cb-sub {
+  font-size: 14px;
+  color: rgba(250,247,242,0.45);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+.cb-sub a {
+  color: var(--rose);
+  text-decoration: none;
+}
+.cb-sub a:hover { color: var(--rose-light); }
+
+.cb-details {
+  background: rgba(250,247,242,0.03);
+  border: 1px solid rgba(201,168,124,0.1);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+.cb-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(250,247,242,0.05);
+  font-size: 14px;
+}
+.cb-detail-row:last-child { border-bottom: none; }
+.cb-detail-row span:first-child { color: rgba(250,247,242,0.38); }
+.cb-detail-row span:last-child  { color: var(--offwhite); }
+
+.cb-actions {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+.cb-btn-back {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--espresso-deep);
+  background: var(--rose);
+  border: none;
+  border-radius: 4px;
+  padding: 14px;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.cb-btn-back:hover { background: var(--rose-light); }
+
+.cb-btn-cancel {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: rgba(250,247,242,0.4);
+  background: none;
+  border: 1px solid rgba(250,247,242,0.1);
+  border-radius: 4px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cb-btn-cancel:hover {
+  color: #f07a7a;
+  border-color: rgba(240,100,100,0.3);
+}
+
+.cb-phone {
+  font-size: 16px;
+  color: var(--rose);
+  margin-top: 12px;
+  letter-spacing: 0.05em;
+}
+
+.cb-footer {
+  margin-top: 32px;
+  font-size: 12px;
+  color: rgba(250,247,242,0.2);
+  position: relative;
+  z-index: 1;
+}
+.cb-footer a {
+  color: var(--rose);
+  text-decoration: none;
+}
