@@ -413,7 +413,8 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function StatsView({ bookings, salon, onUpgrade }) {
-  const [period, setPeriod] = useState(30);
+  const [period, setPeriod]       = useState(30);
+  const [selectedEmp, setSelectedEmp] = useState(null);
 
   const now    = new Date();
   const today  = now.toISOString().split('T')[0];
@@ -422,13 +423,24 @@ function StatsView({ bookings, salon, onUpgrade }) {
   startDate.setDate(startDate.getDate() - period);
   const startStr = startDate.toISOString().split('T')[0];
 
-  const filtered  = bookings.filter(b => b.date >= startStr && b.date <= today);
+  // Filtrare per perioadă + angajat selectat
+  const filtered  = bookings
+    .filter(b => b.date >= startStr && b.date <= today)
+    .filter(b => !selectedEmp || b.employeeName === selectedEmp);
+
   const confirmed = filtered.filter(b => b.status === 'confirmed');
   const cancelled = filtered.filter(b => b.status === 'cancelled');
   const pending   = filtered.filter(b => b.status === 'pending');
   const revenue   = confirmed.reduce((sum, b) => sum + (parseFloat(b.price) || 0), 0);
   const confirmRate = filtered.length > 0
     ? Math.round((confirmed.length / filtered.length) * 100) : 0;
+
+  // Lista angajați pentru filter chips
+  const allEmps = [...new Set(
+    bookings
+      .filter(b => b.date >= startStr && b.date <= today)
+      .map(b => b.employeeName).filter(Boolean)
+  )];
 
   // ── Trend data (bar + line) ──
   const chartDays = Math.min(period, 30);
@@ -494,6 +506,28 @@ function StatsView({ bookings, salon, onUpgrade }) {
           </button>
         ))}
       </div>
+
+      {/* Employee filter */}
+      {allEmps.length > 1 && (
+        <div className="db-emp-filter">
+          <span className="db-emp-filter-label">Filtrează:</span>
+          <button
+            className={`db-emp-chip ${!selectedEmp ? 'active' : ''}`}
+            onClick={() => setSelectedEmp(null)}
+          >
+            Toți angajații
+          </button>
+          {allEmps.map(emp => (
+            <button
+              key={emp}
+              className={`db-emp-chip ${selectedEmp === emp ? 'active' : ''}`}
+              onClick={() => setSelectedEmp(selectedEmp === emp ? null : emp)}
+            >
+              {emp}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* KPIs */}
       <div className="db-kpi-grid">
