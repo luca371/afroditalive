@@ -99,8 +99,9 @@ export default function DashboardScreen() {
       console.warn('Email nu a putut fi trimis.');
     }
 
-    // Trimite SMS
-    if (booking.clientPhone) {
+    // Trimite SMS doar pentru planuri plătite
+    const plan = salon?.plan || 'free';
+    if (booking.clientPhone && plan !== 'free') {
       try {
         const cancelUrl = `${window.location.origin}/cancel/${bookingId}`;
         const dateFormatted = formatDateFromStr(booking.date);
@@ -190,8 +191,8 @@ export default function DashboardScreen() {
           } catch { console.warn('Email reprogramare eșuat.'); }
         }
 
-        // SMS
-        if (booking.clientPhone) {
+        // SMS doar pentru planuri plătite
+        if (booking.clientPhone && (salon?.plan || 'free') !== 'free') {
           try {
             await fetch('/api/send-sms', {
               method: 'POST',

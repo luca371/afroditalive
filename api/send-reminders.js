@@ -79,8 +79,8 @@ module.exports = async (req, res) => {
           }
         );
 
-        // Trimite SMS reminder
-        if (booking.clientPhone) {
+        // Trimite SMS reminder doar pentru planuri plătite
+        if (booking.clientPhone && salon.plan && salon.plan !== 'free') {
           const cancelUrl = `${process.env.APP_URL || 'https://afroditalive.vercel.app'}/cancel/${booking.id}`;
           await sendSMS(
             booking.clientPhone,
