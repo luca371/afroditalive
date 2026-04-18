@@ -57,9 +57,9 @@ export default function BookingScreen() {
 
     const q = query(
       collection(db, 'bookings'),
-      where('salonId',    '==', salon.id),
-      where('employeeId', '==', selectedEmployee.name),
-      where('date',       '==', dateStr)
+      where('salonId',      '==', salon.id),
+      where('employeeName', '==', selectedEmployee.name),
+      where('date',         '==', dateStr)
     );
     const snap = await getDocs(q);
     const existing = snap.docs

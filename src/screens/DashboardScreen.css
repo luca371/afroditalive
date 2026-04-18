@@ -1159,3 +1159,13 @@
   color: var(--rose);
   margin-left: 4px;
 }
+
+.db-cal-edit-btn-locked {
+  color: rgba(250,247,242,0.25) !important;
+  border-color: rgba(250,247,242,0.08) !important;
+  cursor: pointer;
+}
+.db-cal-edit-btn-locked:hover {
+  color: var(--rose) !important;
+  border-color: rgba(201,168,124,0.3) !important;
+}

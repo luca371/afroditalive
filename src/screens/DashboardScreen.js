@@ -441,9 +441,15 @@ export default function DashboardScreen() {
               {/* Edit mode toolbar */}
               {!editMode ? (
                 <div className="db-cal-edit-bar">
-                  <button className="db-cal-edit-btn" onClick={() => setEditMode(true)}>
-                    ✎ Editează calendar
-                  </button>
+                  {['pro', 'business'].includes(salon?.plan) ? (
+                    <button className="db-cal-edit-btn" onClick={() => setEditMode(true)}>
+                      ✎ Editează calendar
+                    </button>
+                  ) : (
+                    <button className="db-cal-edit-btn db-cal-edit-btn-locked" onClick={() => setShowUpgrade(true)}>
+                      🔒 Reprogramare drag & drop — disponibil din Pro
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="db-cal-edit-bar db-cal-edit-bar-active">
