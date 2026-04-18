@@ -49,7 +49,7 @@ export default function BookingScreen() {
     setLoadingSlots(true);
     setSlot(null);
 
-    const dateStr = selectedDate.toISOString().split('T')[0];
+    const dateStr = toLocalDateString(selectedDate);
     const dayName = getDayName(selectedDate);
     const daySchedule = salon.schedule?.[dayName];
 
@@ -91,8 +91,8 @@ export default function BookingScreen() {
       const plan = salon.plan || 'free';
       if (plan === 'free') {
         const now = new Date();
-        const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        const lastOfMonth  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        const firstOfMonth = toLocalDateString(new Date(now.getFullYear(), now.getMonth(), 1));
+        const lastOfMonth  = toLocalDateString(new Date(now.getFullYear(), now.getMonth() + 1, 0));
         const q = query(
           collection(db, 'bookings'),
           where('salonId', '==', salon.id)
@@ -118,7 +118,7 @@ export default function BookingScreen() {
         serviceName:  selectedService.name,
         employeeId:   selectedEmployee.name,
         employeeName: selectedEmployee.name,
-        date:         selectedDate.toISOString().split('T')[0],
+        date:         toLocalDateString(selectedDate),
         timeSlot:     selectedSlot,
         duration:     selectedService.duration,
         status:       'pending',
@@ -523,6 +523,13 @@ function generateSlots(from, to, durationMin, existingBookings) {
     slots.push({ time, available: !overlaps });
   }
   return slots;
+}
+
+function toLocalDateString(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function formatDateRo(date) {
