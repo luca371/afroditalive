@@ -370,10 +370,6 @@ export default function LandingScreen() {
       <section className="l-hero">
         <div className="l-hero-lines" />
 
-        <div className="l-hero-badge">
-          {t.badge}
-        </div>
-
         <h1 className="l-hero-title">
           {lang === 'ro' ? (
             <>{t.heroTitle1}<br /><em>{t.heroTitle2}</em><br />{t.heroTitle3}</>
