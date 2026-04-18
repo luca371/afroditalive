@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
 import UpgradeModal from '../components/UpgradeModal';
+import WelcomeTour  from '../components/WelcomeTour';
 import './DashboardScreen.css';
 
 const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Statistici', 'Setări'];
@@ -26,6 +27,7 @@ export default function DashboardScreen() {
   const [loading, setLoading]     = useState(true);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showTour, setShowTour]       = useState(false);
   const [dragInfo, setDragInfo]   = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
   const [editMode, setEditMode]   = useState(false);
@@ -51,6 +53,14 @@ export default function DashboardScreen() {
     });
     return () => unsub();
   }, [user]);
+
+  // Arată tour-ul la prima autentificare
+  useEffect(() => {
+    if (salon && !salon.tourCompleted) {
+      const t = setTimeout(() => setShowTour(true), 800);
+      return () => clearTimeout(t);
+    }
+  }, [salon]);
 
   async function handleStatus(bookingId, status) {
     await updateDoc(doc(db, 'bookings', bookingId), { status });
@@ -291,7 +301,7 @@ export default function DashboardScreen() {
           {VIEWS.map(v => (
             <button
               key={v}
-              className={`db-nav-item ${view === v ? 'active' : ''}`}
+              className={`db-nav-item db-nav-item-${v} ${view === v ? 'active' : ''}`}
               onClick={() => { setView(v); setMenuOpen(false); }}
             >
               {v === 'Azi'        && <IconToday />}
@@ -585,6 +595,11 @@ export default function DashboardScreen() {
 
       {/* Upgrade modal */}
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+
+      {/* Welcome tour */}
+      {showTour && (
+        <WelcomeTour user={user} onComplete={() => setShowTour(false)} />
+      )}
     </div>
   );
 }
