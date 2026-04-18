@@ -5,6 +5,10 @@ import {
   doc, updateDoc
 } from 'firebase/firestore';
 import emailjs from '@emailjs/browser';
+import {
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, Legend
+} from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
@@ -384,7 +388,260 @@ function UpgradeBanner() {
 }
 
 // ── Stats View ──
+const CHART_COLORS = {
+  confirmed: '#5de07a',
+  pending:   '#C9A87C',
+  cancelled: '#f07a7a',
+  bar:       '#C9A87C',
+  line:      '#C9A87C',
+};
+
+const PIE_COLORS = ['#C9A87C', '#5de07a', '#f07a7a', '#7a9cf0', '#c07af0'];
+
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: 'rgba(26,14,9,0.95)',
+      border: '1px solid rgba(201,168,124,0.3)',
+      borderRadius: 6,
+      padding: '10px 14px',
+      fontFamily: 'DM Sans, sans-serif',
+      fontSize: 13,
+      color: '#FAF7F2',
+    }}>
+      {label && <div style={{ color: 'rgba(250,247,242,0.5)', marginBottom: 4, fontSize: 11 }}>{label}</div>}
+      {payload.map((p, i) => (
+        <div key={i} style={{ color: p.color || '#C9A87C' }}>
+          {p.name}: <strong>{p.value}</strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function StatsView({ bookings, salon, onUpgrade }) {
+  const [period, setPeriod] = useState(30);
+
+  const now    = new Date();
+  const today  = now.toISOString().split('T')[0];
+
+  const startDate = new Date(now);
+  startDate.setDate(startDate.getDate() - period);
+  const startStr = startDate.toISOString().split('T')[0];
+
+  const filtered  = bookings.filter(b => b.date >= startStr && b.date <= today);
+  const confirmed = filtered.filter(b => b.status === 'confirmed');
+  const cancelled = filtered.filter(b => b.status === 'cancelled');
+  const pending   = filtered.filter(b => b.status === 'pending');
+  const revenue   = confirmed.reduce((sum, b) => sum + (parseFloat(b.price) || 0), 0);
+  const confirmRate = filtered.length > 0
+    ? Math.round((confirmed.length / filtered.length) * 100) : 0;
+
+  // ── Trend data (bar + line) ──
+  const chartDays = Math.min(period, 30);
+  const trendData = Array.from({ length: chartDays }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - (chartDays - 1 - i));
+    const dateStr = d.toISOString().split('T')[0];
+    const dayBookings = bookings.filter(b => b.date === dateStr);
+    return {
+      label:     d.toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }),
+      total:     dayBookings.filter(b => b.status !== 'cancelled').length,
+      confirmate: dayBookings.filter(b => b.status === 'confirmed').length,
+      anulate:   dayBookings.filter(b => b.status === 'cancelled').length,
+    };
+  });
+
+  // ── Pie data (status) ──
+  const pieData = [
+    confirmed.length > 0 && { name: 'Confirmate', value: confirmed.length },
+    pending.length   > 0 && { name: 'În așteptare', value: pending.length },
+    cancelled.length > 0 && { name: 'Anulate',     value: cancelled.length },
+  ].filter(Boolean);
+
+  // ── Bar data (servicii) ──
+  const svcCount = {};
+  filtered.forEach(b => { if (b.serviceName) svcCount[b.serviceName] = (svcCount[b.serviceName] || 0) + 1; });
+  const svcData = Object.entries(svcCount)
+    .sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([name, value]) => ({ name: name.length > 12 ? name.slice(0, 12) + '…' : name, value }));
+
+  // ── Insights ──
+  const dayNames = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
+  const dayCount = {};
+  filtered.forEach(b => {
+    if (b.date) {
+      const day = dayNames[new Date(b.date + 'T12:00:00').getDay()];
+      dayCount[day] = (dayCount[day] || 0) + 1;
+    }
+  });
+  const topDay = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0];
+
+  const hourCount = {};
+  filtered.forEach(b => {
+    if (b.timeSlot) {
+      const h = b.timeSlot.split(':')[0] + ':00';
+      hourCount[h] = (hourCount[h] || 0) + 1;
+    }
+  });
+  const topHour = Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0];
+
+  const empCount = {};
+  filtered.forEach(b => { if (b.employeeName) empCount[b.employeeName] = (empCount[b.employeeName] || 0) + 1; });
+  const topEmp = Object.entries(empCount).sort((a, b) => b[1] - a[1])[0];
+
+  return (
+    <div className="db-content db-stats-view">
+
+      {/* Period */}
+      <div className="db-stats-toolbar">
+        {[7, 30, 90].map(p => (
+          <button key={p} className={`db-stats-period ${period === p ? 'active' : ''}`} onClick={() => setPeriod(p)}>
+            {p === 7 ? 'Ultima săptămână' : p === 30 ? 'Ultima lună' : 'Ultimele 3 luni'}
+          </button>
+        ))}
+      </div>
+
+      {/* KPIs */}
+      <div className="db-kpi-grid">
+        {[
+          { num: filtered.length,   label: 'Total programări', color: '' },
+          { num: confirmed.length,  label: 'Confirmate',       color: 'db-kpi-green' },
+          { num: cancelled.length,  label: 'Anulate',          color: 'db-kpi-red' },
+          { num: pending.length,    label: 'În așteptare',     color: '' },
+          { num: `${confirmRate}%`, label: 'Rată confirmare',  color: 'db-kpi-green' },
+          ...(revenue > 0 ? [{ num: `${revenue} lei`, label: 'Venit estimat', color: 'db-kpi-green' }] : []),
+        ].map((k, i) => (
+          <div key={i} className="db-kpi">
+            <span className={`db-kpi-num ${k.color}`}>{k.num}</span>
+            <span className="db-kpi-label">{k.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts row 1 */}
+      <div className="db-charts-row">
+
+        {/* Trend Bar Chart */}
+        <div className="db-chart-card db-chart-card-wide">
+          <div className="db-chart-card-title">Programări pe zile</div>
+          {filtered.length === 0 ? (
+            <div className="db-stats-empty">Fără date în perioada selectată.</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={trendData} barSize={chartDays > 20 ? 6 : 12} margin={{ top: 16, right: 8, bottom: 0, left: -20 }}>
+                <XAxis
+                  dataKey="label"
+                  tick={{ fill: 'rgba(250,247,242,0.3)', fontSize: 10 }}
+                  tickLine={false} axisLine={false}
+                  interval={chartDays > 20 ? Math.floor(chartDays / 6) : 0}
+                />
+                <YAxis tick={{ fill: 'rgba(250,247,242,0.3)', fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(201,168,124,0.08)' }} />
+                <Bar dataKey="confirmate" name="Confirmate" fill="#5de07a" radius={[2,2,0,0]} />
+                <Bar dataKey="anulate"    name="Anulate"    fill="#f07a7a" radius={[2,2,0,0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Pie Chart */}
+        <div className="db-chart-card">
+          <div className="db-chart-card-title">Distribuție status</div>
+          {pieData.length === 0 ? (
+            <div className="db-stats-empty">Fără date.</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%" cy="50%"
+                  innerRadius={50} outerRadius={80}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {pieData.map((_, i) => (
+                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  iconType="circle" iconSize={8}
+                  formatter={v => <span style={{ color: 'rgba(250,247,242,0.6)', fontSize: 12 }}>{v}</span>}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
+      {/* Charts row 2 */}
+      <div className="db-charts-row">
+
+        {/* Line trend */}
+        <div className="db-chart-card db-chart-card-wide">
+          <div className="db-chart-card-title">Trend total programări</div>
+          {filtered.length === 0 ? (
+            <div className="db-stats-empty">Fără date.</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={trendData} margin={{ top: 16, right: 8, bottom: 0, left: -20 }}>
+                <XAxis
+                  dataKey="label"
+                  tick={{ fill: 'rgba(250,247,242,0.3)', fontSize: 10 }}
+                  tickLine={false} axisLine={false}
+                  interval={chartDays > 20 ? Math.floor(chartDays / 6) : 0}
+                />
+                <YAxis tick={{ fill: 'rgba(250,247,242,0.3)', fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="monotone" dataKey="total" name="Total"
+                  stroke="#C9A87C" strokeWidth={2} dot={false}
+                  activeDot={{ r: 4, fill: '#C9A87C' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Bar servicii */}
+        <div className="db-chart-card">
+          <div className="db-chart-card-title">Top servicii</div>
+          {svcData.length === 0 ? (
+            <div className="db-stats-empty">Fără date.</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={svcData} layout="vertical" margin={{ top: 4, right: 24, bottom: 4, left: 4 }}>
+                <XAxis type="number" tick={{ fill: 'rgba(250,247,242,0.3)', fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
+                <YAxis type="category" dataKey="name" tick={{ fill: 'rgba(250,247,242,0.6)', fontSize: 11 }} tickLine={false} axisLine={false} width={80} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(201,168,124,0.08)' }} />
+                <Bar dataKey="value" name="Programări" fill="#C9A87C" radius={[0,2,2,0]} barSize={14} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
+      {/* Insights */}
+      <div className="db-insights-row">
+        {[
+          topDay  && { label: 'Ziua cea mai aglomerată', val: topDay[0],  sub: `${topDay[1]} programări` },
+          topHour && { label: 'Ora cea mai cerută',       val: topHour[0], sub: `${topHour[1]} programări` },
+          topEmp  && { label: 'Angajatul top',            val: topEmp[0],  sub: `${topEmp[1]} programări` },
+          filtered.length > 0 && { label: 'Medie zilnică', val: `${(filtered.length / period).toFixed(1)}/zi`, sub: `în ${period} zile` },
+        ].filter(Boolean).map((ins, i) => (
+          <div key={i} className="db-insight-card">
+            <div className="db-insight-card-val">{ins.val}</div>
+            <div className="db-insight-card-label">{ins.label}</div>
+            <div className="db-insight-card-sub">{ins.sub}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
+}
   const [period, setPeriod] = useState(30);
 
   const now   = new Date();
