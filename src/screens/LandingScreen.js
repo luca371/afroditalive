@@ -245,10 +245,10 @@ const T = {
     pricingLabel: 'Prețuri', pricingTitle1: 'Transparent.', pricingTitle2: 'Fără surprize.',
     pricingSub: 'Alegi planul potrivit. Poți schimba oricând.',
     plans: [
-      { name: 'Free', price: '0', period: 'Pentru totdeauna', features: ['1 angajat', 'Până la 30 programări/lună', 'Pagina publică de booking', 'Dashboard de bază'], cta: 'Începe gratuit' },
-      { name: 'Starter', price: '15', period: 'Facturare lunară', features: ['3 angajați', 'Programări nelimitate', 'Calendar săptămânal', 'Confirmare/anulare din dashboard'], cta: 'Alege Starter' },
-      { name: 'Pro', price: '45', period: 'Facturare lunară', features: ['10 angajați', 'Programări nelimitate', 'Email confirmări automate', 'Statistici avansate', 'Prioritate la suport'], cta: 'Alege Pro', badge: 'Cel mai ales', featured: true },
-      { name: 'Business', price: '99', period: 'Facturare lunară', features: ['Angajați nelimitați', 'Mai multe locații', 'Email confirmări incluse', 'Onboarding dedicat', 'Integrare site propriu'], cta: 'Alege Business' },
+      { name: 'Free', price: '0', period: 'Pentru totdeauna', features: ['1 angajat', 'Până la 30 programări/lună', 'Pagina publică de booking', 'Email confirmare automată', 'Dashboard de bază'], cta: 'Începe gratuit' },
+      { name: 'Starter', price: '15', period: 'Facturare lunară', features: ['3 angajați', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Calendar săptămânal', 'Statistici de bază'], cta: 'Alege Starter' },
+      { name: 'Pro', price: '45', period: 'Facturare lunară', features: ['10 angajați', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Statistici avansate cu grafice', 'Reprogramare drag & drop', 'Prioritate la suport'], cta: 'Alege Pro', badge: 'Cel mai ales', featured: true },
+      { name: 'Business', price: '99', period: 'Facturare lunară', features: ['Angajați nelimitați', 'Mai multe locații', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Statistici complete', 'Reprogramare drag & drop', 'Onboarding dedicat'], cta: 'Alege Business' },
     ],
     quote: '„De când am Afrodita, nu mai pierd timp la telefon. Clientele se programează singure, chiar și duminica la miezul nopții."',
     quoteAuthor: 'Andreea M. · Studio Lumière, București',
@@ -288,10 +288,10 @@ const T = {
     pricingLabel: 'Pricing', pricingTitle1: 'Transparent.', pricingTitle2: 'No surprises.',
     pricingSub: 'Choose the right plan. Change anytime.',
     plans: [
-      { name: 'Free', price: '0', period: 'Forever', features: ['1 staff member', 'Up to 30 bookings/month', 'Public booking page', 'Basic dashboard'], cta: 'Get started free' },
-      { name: 'Starter', price: '15', period: 'Monthly billing', features: ['3 staff members', 'Unlimited bookings', 'Weekly calendar', 'Confirm/cancel from dashboard'], cta: 'Choose Starter' },
-      { name: 'Pro', price: '45', period: 'Monthly billing', features: ['10 staff members', 'Unlimited bookings', 'Automatic email confirmations', 'Advanced analytics', 'Priority support'], cta: 'Choose Pro', badge: 'Most popular', featured: true },
-      { name: 'Business', price: '99', period: 'Monthly billing', features: ['Unlimited staff', 'Multiple locations', 'Email confirmations included', 'Dedicated onboarding', 'Website integration'], cta: 'Choose Business' },
+      { name: 'Free', price: '0', period: 'Forever', features: ['1 staff member', 'Up to 30 bookings/month', 'Public booking page', 'Automatic email confirmation', 'Basic dashboard'], cta: 'Get started free' },
+      { name: 'Starter', price: '15', period: 'Monthly billing', features: ['3 staff members', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Weekly calendar', 'Basic analytics'], cta: 'Choose Starter' },
+      { name: 'Pro', price: '45', period: 'Monthly billing', features: ['10 staff members', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Advanced analytics with charts', 'Drag & drop rescheduling', 'Priority support'], cta: 'Choose Pro', badge: 'Most popular', featured: true },
+      { name: 'Business', price: '99', period: 'Monthly billing', features: ['Unlimited staff', 'Multiple locations', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Full analytics', 'Drag & drop rescheduling', 'Dedicated onboarding'], cta: 'Choose Business' },
     ],
     quote: '"Since I started using Afrodita, I no longer waste time on the phone. Clients book themselves, even on Sunday at midnight."',
     quoteAuthor: 'Andreea M. · Studio Lumière, Bucharest',
@@ -369,6 +369,10 @@ export default function LandingScreen() {
       {/* ─── HERO ─── */}
       <section className="l-hero">
         <div className="l-hero-lines" />
+
+        <div className="l-hero-badge">
+          {t.badge}
+        </div>
 
         <h1 className="l-hero-title">
           {lang === 'ro' ? (
