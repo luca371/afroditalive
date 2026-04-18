@@ -218,10 +218,6 @@ export default function LandingScreen() {
       <section className="l-hero">
         <div className="l-hero-lines" />
 
-        <div className="l-hero-badge">
-          Programări inteligente pentru saloane
-        </div>
-
         <h1 className="l-hero-title">
           Eleganța<br />
           <em>digitală</em><br />
