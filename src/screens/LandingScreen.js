@@ -163,9 +163,100 @@ function InteractiveMockup() {
   );
 }
 
+const T = {
+  ro: {
+    navHow: 'Cum funcționează', navFeatures: 'Funcții', navPricing: 'Prețuri', navCta: 'Încearcă gratuit',
+    badge: 'Programări inteligente pentru saloane',
+    heroTitle1: 'Eleganța', heroTitle2: 'digitală', heroTitle3: 'a salonului tău',
+    heroSub: 'Booking online. Dashboard complet. Zero complicații.',
+    heroDesc: 'Afrodita transformă programările telefonice în rezervări online elegante — pentru clienții tăi și pentru tine.',
+    heroBtn: 'Începe gratuit', heroGhost: 'Descoperă cum funcționează',
+    howLabel: 'Cum funcționează', howTitle1: 'Simplu pentru tine.', howTitle2: 'Elegant', howTitle3: 'pentru clienți.',
+    howSub: 'De la configurare la prima programare — în mai puțin de 30 de minute.',
+    steps: [
+      { name: 'Creezi contul', desc: 'Înregistrezi salonul, adaugi serviciile, angajații și programul de lucru.' },
+      { name: 'Partajezi linkul', desc: 'Primești un link unic pe care îl pui pe Instagram, Google sau site-ul tău.' },
+      { name: 'Clienții se programează', desc: 'Aleg serviciul, stilistul și ora disponibilă — fără să-și creeze cont.' },
+      { name: 'Tu gestionezi din dashboard', desc: 'Vezi toate programările în timp real, confirmi sau anulezi, și primești SMS automat.' },
+    ],
+    featLabel: 'Funcționalități', featTitle1: 'Tot ce ai nevoie.', featTitle2: 'Nimic în plus.',
+    featSub: 'Construit specific pentru saloane de înfrumusețare din România.',
+    features: [
+      { name: 'Calendar în timp real', desc: 'Sloturile disponibile se actualizează instant. Niciodată două programări în același timp.' },
+      { name: 'Pagina ta de booking', desc: 'O pagină elegantă, personalizată cu numele și culorile salonului tău. Zero programare tehnică.' },
+      { name: 'Fără cont pentru clienți', desc: 'Clienții se programează doar cu nume și telefon. Simplu, rapid, fără bariere.' },
+      { name: 'Dashboard complet', desc: 'Programările de azi, calendarul săptămânal și statistici clare despre performanța salonului.' },
+      { name: 'SMS reminder automat', desc: 'Clientul primește un SMS cu 24 de ore înainte. Reduci no-show-urile cu până la 60%.' },
+      { name: 'Multi-angajat', desc: 'Fiecare stilist cu programul și serviciile lui. Clientul alege cu cine și când.' },
+    ],
+    pricingLabel: 'Prețuri', pricingTitle1: 'Transparent.', pricingTitle2: 'Fără surprize.',
+    pricingSub: 'Alegi planul potrivit. Poți schimba oricând.',
+    plans: [
+      { name: 'Free', price: '0', period: 'Pentru totdeauna', features: ['1 angajat', 'Până la 30 programări/lună', 'Pagina publică de booking', 'Dashboard de bază'], cta: 'Începe gratuit' },
+      { name: 'Starter', price: '15', period: 'Facturare lunară', features: ['3 angajați', 'Programări nelimitate', 'Calendar săptămânal', 'Confirmare/anulare din dashboard'], cta: 'Alege Starter' },
+      { name: 'Pro', price: '45', period: 'Facturare lunară', features: ['10 angajați', 'Programări nelimitate', 'Email confirmări automate', 'Statistici avansate', 'Prioritate la suport'], cta: 'Alege Pro', badge: 'Cel mai ales', featured: true },
+      { name: 'Business', price: '99', period: 'Facturare lunară', features: ['Angajați nelimitați', 'Mai multe locații', 'Email confirmări incluse', 'Onboarding dedicat', 'Integrare site propriu'], cta: 'Alege Business' },
+    ],
+    quote: '{t.quote}',
+    quoteAuthor: '{t.quoteAuthor}',
+    ctaTitle1: 'Pregătit să transformi', ctaTitle2: 'salonul tău?',
+    ctaSub: 'Gratuit pentru totdeauna. Fără card bancar.',
+    ctaBtn: '{t.ctaBtn}',
+    ctaNote: '{t.ctaNote}',
+    footerTerms: 'Termeni', footerPrivacy: 'Confidențialitate', footerContact: 'Contact',
+    footerCopy: '{t.footerCopy}',
+    currency: 'lei/lună',
+  },
+  en: {
+    navHow: 'How it works', navFeatures: 'Features', navPricing: 'Pricing', navCta: 'Try for free',
+    badge: 'Smart booking for beauty salons',
+    heroTitle1: 'The digital', heroTitle2: 'elegance', heroTitle3: 'of your salon',
+    heroSub: 'Online booking. Full dashboard. Zero hassle.',
+    heroDesc: 'Afrodita turns phone bookings into elegant online reservations — for your clients and for you.',
+    heroBtn: 'Get started free', heroGhost: 'Discover how it works',
+    howLabel: 'How it works', howTitle1: 'Simple for you.', howTitle2: 'Elegant', howTitle3: 'for your clients.',
+    howSub: 'From setup to first booking — in less than 30 minutes.',
+    steps: [
+      { name: 'Create your account', desc: 'Register your salon, add services, employees and working hours.' },
+      { name: 'Share your link', desc: 'Get a unique link to put on Instagram, Google or your website.' },
+      { name: 'Clients book online', desc: 'They choose service, stylist and time — no account needed.' },
+      { name: 'Manage from dashboard', desc: 'See all bookings in real time, confirm or cancel, get automatic reminders.' },
+    ],
+    featLabel: 'Features', featTitle1: 'Everything you need.', featTitle2: 'Nothing more.',
+    featSub: 'Built specifically for beauty salons.',
+    features: [
+      { name: 'Real-time calendar', desc: 'Available slots update instantly. Never double-book again.' },
+      { name: 'Your booking page', desc: 'An elegant page, personalized with your salon name and colors. Zero coding required.' },
+      { name: 'No account for clients', desc: 'Clients book with just name and phone. Simple, fast, no barriers.' },
+      { name: 'Full dashboard', desc: "Today's bookings, weekly calendar and clear stats about your salon's performance." },
+      { name: 'Automatic SMS reminder', desc: 'Client gets an SMS 24 hours before. Reduce no-shows by up to 60%.' },
+      { name: 'Multi-staff', desc: 'Each stylist with their own schedule and services. Client chooses who and when.' },
+    ],
+    pricingLabel: 'Pricing', pricingTitle1: 'Transparent.', pricingTitle2: 'No surprises.',
+    pricingSub: 'Choose the right plan. Change anytime.',
+    plans: [
+      { name: 'Free', price: '0', period: 'Forever', features: ['1 staff member', 'Up to 30 bookings/month', 'Public booking page', 'Basic dashboard'], cta: 'Get started free' },
+      { name: 'Starter', price: '15', period: 'Monthly billing', features: ['3 staff members', 'Unlimited bookings', 'Weekly calendar', 'Confirm/cancel from dashboard'], cta: 'Choose Starter' },
+      { name: 'Pro', price: '45', period: 'Monthly billing', features: ['10 staff members', 'Unlimited bookings', 'Automatic email confirmations', 'Advanced analytics', 'Priority support'], cta: 'Choose Pro', badge: 'Most popular', featured: true },
+      { name: 'Business', price: '99', period: 'Monthly billing', features: ['Unlimited staff', 'Multiple locations', 'Email confirmations included', 'Dedicated onboarding', 'Website integration'], cta: 'Choose Business' },
+    ],
+    quote: '"Since I started using Afrodita, I no longer waste time on the phone. Clients book themselves, even on Sunday at midnight."',
+    quoteAuthor: 'Andreea M. · Studio Lumière, Bucharest',
+    ctaTitle1: 'Ready to transform', ctaTitle2: 'your salon?',
+    ctaSub: 'Free forever. No credit card required.',
+    ctaBtn: 'Create free account',
+    ctaNote: 'Full setup in less than 30 minutes',
+    footerTerms: 'Terms', footerPrivacy: 'Privacy', footerContact: 'Contact',
+    footerCopy: '© 2025 Afroditalive. Built in Romania.',
+    currency: 'RON/mo',
+  },
+};
+
 export default function LandingScreen() {
-  const navRef = useRef(null);
+  const navRef  = useRef(null);
   const navigate = useNavigate();
+  const [lang, setLang] = useState('ro');
+  const t = T[lang];
 
   // Nav scroll effect
   useEffect(() => {
@@ -203,12 +294,20 @@ export default function LandingScreen() {
       <nav className="l-nav" ref={navRef}>
         <a href="/" className="l-logo">Afrodita</a>
         <ul className="l-nav-links">
-          <li><a href="#how">Cum funcționează</a></li>
-          <li><a href="#features">Funcții</a></li>
-          <li><a href="#pricing">Prețuri</a></li>
+          <li><a href="#how">{t.navHow}</a></li>
+          <li><a href="#features">{t.navFeatures}</a></li>
+          <li><a href="#pricing">{t.navPricing}</a></li>
+          <li>
+            <button
+              className="l-lang-toggle"
+              onClick={() => setLang(l => l === 'ro' ? 'en' : 'ro')}
+            >
+              {lang === 'ro' ? '🇬🇧 EN' : '🇷🇴 RO'}
+            </button>
+          </li>
           <li>
             <button className="l-nav-cta" onClick={() => navigate('/register')}>
-              Încearcă gratuit
+              {t.navCta}
             </button>
           </li>
         </ul>
@@ -218,27 +317,27 @@ export default function LandingScreen() {
       <section className="l-hero">
         <div className="l-hero-lines" />
 
+        <div className="l-hero-badge">
+          {t.badge}
+        </div>
+
         <h1 className="l-hero-title">
-          Eleganța<br />
-          <em>digitală</em><br />
-          a salonului tău
+          {lang === 'ro' ? (
+            <>{t.heroTitle1}<br /><em>{t.heroTitle2}</em><br />{t.heroTitle3}</>
+          ) : (
+            <>{t.heroTitle1}<br /><em>{t.heroTitle2}</em><br />{t.heroTitle3}</>
+          )}
         </h1>
 
-        <p className="l-hero-subtitle">
-          Booking online. Dashboard complet. Zero complicații.
-        </p>
-
-        <p className="l-hero-desc">
-          Afrodita transformă programările telefonice în rezervări online
-          elegante — pentru clienții tăi și pentru tine.
-        </p>
+        <p className="l-hero-subtitle">{t.heroSub}</p>
+        <p className="l-hero-desc">{t.heroDesc}</p>
 
         <div className="l-hero-actions">
           <button className="l-btn-primary" onClick={() => navigate('/register')}>
-            Începe gratuit
+            {t.heroBtn}
           </button>
           <a href="#how" className="l-btn-ghost">
-            Descoperă cum funcționează
+            {t.heroGhost}
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
@@ -260,48 +359,24 @@ export default function LandingScreen() {
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="l-how" id="how">
-        <div className="l-section-label">Cum funcționează</div>
+        <div className="l-section-label">{t.howLabel}</div>
         <h2 className="l-section-title l-reveal">
-          Simplu pentru tine.<br /><em>Elegant</em> pentru clienți.
+          {t.howTitle1}<br /><em>{t.howTitle2}</em> {t.howTitle3}
         </h2>
-        <p className="l-section-sub l-reveal">
-          De la configurare la prima programare — în mai puțin de 30 de minute.
-        </p>
-
-        <div className="l-line-divider l-reveal">
-          <div className="l-line-divider-dot" />
-        </div>
-
+        <p className="l-section-sub l-reveal">{t.howSub}</p>
+        <div className="l-line-divider l-reveal"><div className="l-line-divider-dot" /></div>
         <div className="l-steps">
-          {[
-            {
-              num: '01', name: 'Creezi contul',
-              desc: 'Înregistrezi salonul, adaugi serviciile, angajații și programul de lucru.',
-              icon: <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z" />,
-            },
-            {
-              num: '02', name: 'Partajezi linkul',
-              desc: 'Primești un link unic pe care îl pui pe Instagram, Google sau site-ul tău.',
-              icon: <><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" /><path d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.1-1.1" /></>,
-            },
-            {
-              num: '03', name: 'Clienții se programează',
-              desc: 'Aleg serviciul, stilistul și ora disponibilă — fără să-și creeze cont.',
-              icon: <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>,
-            },
-            {
-              num: '04', name: 'Tu gestionezi din dashboard',
-              desc: 'Vezi toate programările în timp real, confirmi sau anulezi, și primești SMS automat.',
-              icon: <><path d="M9 12l2 2 4-4" /><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /></>,
-            },
-          ].map((step, i) => (
+          {t.steps.map((step, i) => (
             <div key={i} className={`l-step l-reveal l-reveal-d${i}`}>
               <div className="l-step-icon">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  {step.icon}
+                  {i === 0 && <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/>}
+                  {i === 1 && <><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/><path d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.1-1.1"/></>}
+                  {i === 2 && <><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></>}
+                  {i === 3 && <><path d="M9 12l2 2 4-4"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></>}
                 </svg>
               </div>
-              <span className="l-step-num">{step.num}</span>
+              <span className="l-step-num">0{i + 1}</span>
               <h3 className="l-step-name">{step.name}</h3>
               <p className="l-step-desc">{step.desc}</p>
             </div>
@@ -311,94 +386,50 @@ export default function LandingScreen() {
 
       {/* ─── FEATURES ─── */}
       <section className="l-features" id="features">
-        <div className="l-section-label">Funcționalități</div>
+        <div className="l-section-label">{t.featLabel}</div>
         <h2 className="l-section-title l-reveal">
-          Tot ce ai nevoie.<br /><em>Nimic în plus.</em>
+          {t.featTitle1}<br /><em>{t.featTitle2}</em>
         </h2>
-        <p className="l-section-sub l-reveal">
-          Construit specific pentru saloane de înfrumusețare din România.
-        </p>
+        <p className="l-section-sub l-reveal">{t.featSub}</p>
 
         <div className="l-features-grid">
-          {[
-            {
-              name: 'Calendar în timp real',
-              desc: 'Sloturile disponibile se actualizează instant. Niciodată două programări în același timp.',
-              icon: <><rect x="6" y="8" width="32" height="30" rx="4" /><path d="M14 4v8M30 4v8M6 20h32" /><circle cx="22" cy="30" r="3" /></>,
-            },
-            {
-              name: 'Pagina ta de booking',
-              desc: 'O pagină elegantă, personalizată cu numele și culorile salonului tău. Zero programare tehnică.',
-              icon: <path d="M22 4l4.9 9.9L38 15.6l-8 7.8 1.9 11-9.9-5.2L12 34.4l1.9-11-8-7.8 11.1-1.7z" />,
-            },
-            {
-              name: 'Fără cont pentru clienți',
-              desc: 'Clienții se programează doar cu nume și telefon. Simplu, rapid, fără bariere.',
-              icon: <><path d="M8 36l6-6m0 0l4-4m-4 4l-4-4m4 4l4 4" /><path d="M14 14c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8z" /><path d="M36 36c0-5.5-4.5-10-10-10H18" /></>,
-            },
-            {
-              name: 'Dashboard complet',
-              desc: 'Programările de azi, calendarul săptămânal și statistici clare despre performanța salonului.',
-              icon: <><path d="M8 8h28v4H8z" /><path d="M8 18h20M8 26h16M8 34h12" /><path d="M30 26l4 4 8-8" strokeWidth="1.8" /></>,
-            },
-            {
-              name: 'SMS reminder automat',
-              desc: 'Clientul primește un SMS cu 24 de ore înainte. Reduci no-show-urile cu până la 60%.',
-              icon: <><path d="M8 32l4-4 6 6 8-16 6 8 4-4" /><path d="M4 38h36" /></>,
-            },
-            {
-              name: 'Multi-angajat',
-              desc: 'Fiecare stilist cu programul și serviciile lui. Clientul alege cu cine și când.',
-              icon: <><path d="M22 8v28M8 22h28" /><circle cx="22" cy="22" r="16" /></>,
-            },
-          ].map((f, i) => (
-            <div key={i} className="l-feature l-reveal">
-              <svg className="l-feature-icon" fill="none" stroke="currentColor" strokeWidth="1.2" viewBox="0 0 44 44">
-                {f.icon}
-              </svg>
-              <h3 className="l-feature-name">{f.name}</h3>
-              <p className="l-feature-desc">{f.desc}</p>
-            </div>
-          ))}
+          {t.features.map((f, i) => {
+            const icons = [
+              <><rect x="6" y="8" width="32" height="30" rx="4" /><path d="M14 4v8M30 4v8M6 20h32" /><circle cx="22" cy="30" r="3" /></>,
+              <path d="M22 4l4.9 9.9L38 15.6l-8 7.8 1.9 11-9.9-5.2L12 34.4l1.9-11-8-7.8 11.1-1.7z" />,
+              <><path d="M8 36l6-6m0 0l4-4m-4 4l-4-4m4 4l4 4" /><path d="M14 14c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8z" /><path d="M36 36c0-5.5-4.5-10-10-10H18" /></>,
+              <><path d="M8 8h28v4H8z" /><path d="M8 18h20M8 26h16M8 34h12" /><path d="M30 26l4 4 8-8" strokeWidth="1.8" /></>,
+              <><path d="M8 32l4-4 6 6 8-16 6 8 4-4" /><path d="M4 38h36" /></>,
+              <><path d="M22 8v28M8 22h28" /><circle cx="22" cy="22" r="16" /></>,
+            ];
+            return (
+              <div key={i} className="l-feature l-reveal">
+                <svg className="l-feature-icon" fill="none" stroke="currentColor" strokeWidth="1.2" viewBox="0 0 44 44">
+                  {icons[i]}
+                </svg>
+                <h3 className="l-feature-name">{f.name}</h3>
+                <p className="l-feature-desc">{f.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
       {/* ─── PRICING ─── */}
       <section className="l-pricing" id="pricing">
-        <div className="l-section-label">Prețuri</div>
+        <div className="l-section-label">{t.pricingLabel}</div>
         <h2 className="l-section-title l-reveal">
-          Transparent.<br /><em>Fără surprize.</em>
+          {t.pricingTitle1}<br /><em>{t.pricingTitle2}</em>
         </h2>
-        <p className="l-section-sub l-reveal">Alegi planul potrivit. Poți schimba oricând.</p>
+        <p className="l-section-sub l-reveal">{t.pricingSub}</p>
 
         <div className="l-plans">
-          {[
-            {
-              name: 'Free', price: '0', period: 'Pentru totdeauna',
-              features: ['1 angajat', 'Până la 30 programări/lună', 'Pagina publică de booking', 'Dashboard de bază'],
-              cta: 'Începe gratuit', featured: false,
-            },
-            {
-              name: 'Starter', price: '15', period: 'Facturare lunară',
-              features: ['3 angajați', 'Programări nelimitate', 'Calendar săptămânal', 'Confirmare/anulare din dashboard'],
-              cta: 'Alege Starter', featured: false,
-            },
-            {
-              name: 'Pro', price: '45', period: 'Facturare lunară',
-              features: ['10 angajați', 'Programări nelimitate', 'Email confirmări automate', 'Statistici avansate', 'Prioritate la suport'],
-              cta: 'Alege Pro', featured: true, badge: 'Cel mai ales',
-            },
-            {
-              name: 'Business', price: '99', period: 'Facturare lunară',
-              features: ['Angajați nelimitați', 'Mai multe locații', 'Email confirmări incluse', 'Onboarding dedicat', 'Integrare site propriu'],
-              cta: 'Alege Business', featured: false,
-            },
-          ].map((plan, i) => (
+          {t.plans.map((plan, i) => (
             <div key={i} className={`l-plan l-reveal l-reveal-d${i} ${plan.featured ? 'featured' : ''}`}>
               {plan.badge && <div className="l-plan-badge">{plan.badge}</div>}
               <div className="l-plan-name">{plan.name}</div>
               <div className="l-plan-price">
-                {plan.price} <small>lei/lună</small>
+                {plan.price} <small>{t.currency}</small>
               </div>
               <div className="l-plan-period">{plan.period}</div>
               <div className="l-plan-divider" />
@@ -416,22 +447,22 @@ export default function LandingScreen() {
       {/* ─── QUOTE ─── */}
       <section className="l-quote">
         <p className="l-quote-text l-reveal">
-          „De când am Afrodita, nu mai pierd timp la telefon. Clientele se programează singure, chiar și duminica la miezul nopții."
+          {t.quote}
         </p>
-        <p className="l-quote-author l-reveal">Andreea M. · Studio Lumière, București</p>
+        <p className="l-quote-author l-reveal">{t.quoteAuthor}</p>
       </section>
 
       {/* ─── CTA ─── */}
       <section className="l-cta">
         <h2 className="l-cta-title l-reveal">
-          Pregătit să transformi<br /><em>salonul tău?</em>
+          {t.ctaTitle1}<br /><em>{t.ctaTitle2}</em>
         </h2>
-        <p className="l-cta-sub l-reveal">Gratuit pentru totdeauna. Fără card bancar.</p>
+        <p className="l-cta-sub l-reveal">{t.ctaSub}</p>
         <div className="l-cta-actions l-reveal">
           <button className="l-btn-primary" onClick={() => navigate('/register')}>
-            Creează contul gratuit
+            {t.ctaBtn}
           </button>
-          <span className="l-cta-note">Îl configurezi complet în mai puțin de 30 de minute</span>
+          <span className="l-cta-note">{t.ctaNote}</span>
         </div>
       </section>
 
@@ -439,11 +470,11 @@ export default function LandingScreen() {
       <footer className="l-footer">
         <div className="l-footer-logo">Afrodita</div>
         <ul className="l-footer-links">
-          <li><a href="/termeni">Termeni</a></li>
-          <li><a href="/confidentialitate">Confidențialitate</a></li>
-          <li><a href="/contact">Contact</a></li>
+          <li><a href="/termeni">{t.footerTerms}</a></li>
+          <li><a href="/confidentialitate">{t.footerPrivacy}</a></li>
+          <li><a href="/contact">{t.footerContact}</a></li>
         </ul>
-        <p className="l-footer-copy">© 2025 Afroditalive. Construit în România.</p>
+        <p className="l-footer-copy">{t.footerCopy}</p>
       </footer>
 
     </div>
