@@ -34,23 +34,43 @@ function InteractiveMockup({ lang = 'ro' }) {
   const SLOTS = lang === 'ro' ? SLOTS_RO : SLOTS_EN;
   const INITIAL_BOOKINGS = lang === 'ro' ? BOOKINGS_RO : BOOKINGS_EN;
 
-  const labelBookingPage  = lang === 'ro' ? '{labelBookingPage}'  : 'Your booking page';
-  const labelSelectHour   = lang === 'ro' ? '{labelSelectHour}'      : 'Select a time';
-  const labelDashboard    = lang === 'ro' ? '{labelDashboard}' : 'Salon dashboard · Today';
-  const labelConfirmed    = lang === 'ro' ? 'Confirmat'             : 'Confirmed';
-  const labelPending      = lang === 'ro' ? 'În așteptare'          : 'Pending';
-  const labelTaken        = lang === 'ro' ? {labelTaken}                : 'Taken';
-  const labelConfirmAppt  = lang === 'ro' ? '{labelConfirmAppt}'  : 'Confirm booking';
-  const labelYourName     = lang === 'ro' ? '{labelYourName}'            : 'Your name';
-  const labelPhone        = lang === 'ro' ? '{labelPhone}'               : 'Phone';
-  const labelNamePh       = lang === 'ro' ? '{labelNamePh}'     : 'e.g. Sarah Johnson';
-  const labelPhonePh      = lang === 'ro' ? '{labelPhonePh}'          : '+44 7xx xxx xxx';
-  const labelBack         = lang === 'ro' ? {labelBack}              : '← Back';
-  const labelConfirmBtn   = lang === 'ro' ? 'Confirmă'              : 'Confirm';
-  const labelSuccessTitle = lang === 'ro' ? '{labelSuccessTitle}' : 'Booking confirmed!';
-  const labelSuccessNote  = lang === 'ro' ? '{labelSuccessNote}' : 'You will receive a confirmation SMS.';
-  const labelRetry        = lang === 'ro' ? '{labelRetry}'    : '↺ Try again';
-  const bookingsLabel     = lang === 'ro' ? 'programări'            : 'bookings';
+  const L = lang === 'ro' ? {
+    bookingPage:  'Pagina ta de booking',
+    selectHour:   'Selectează o oră',
+    dashboard:    'Dashboard salon · Azi',
+    confirmed:    'Confirmat',
+    pending:      'În așteptare',
+    taken:        'Ocupat',
+    confirmAppt:  'Confirmă programarea',
+    yourName:     'Numele tău',
+    phone:        'Telefon',
+    namePh:       'ex. Ioana Popescu',
+    phonePh:      '07xx xxx xxx',
+    back:         '← Înapoi',
+    confirmBtn:   'Confirmă',
+    successTitle: 'Programare confirmată!',
+    successNote:  'Vei primi un SMS de confirmare.',
+    retry:        '{L.retry}',
+    bookings:     'programări',
+  } : {
+    bookingPage:  'Your booking page',
+    selectHour:   'Select a time',
+    dashboard:    'Salon dashboard · Today',
+    confirmed:    'Confirmed',
+    pending:      'Pending',
+    taken:        'Taken',
+    confirmAppt:  'Confirm booking',
+    yourName:     'Your name',
+    phone:        'Phone',
+    namePh:       'e.g. Sarah Johnson',
+    phonePh:      '+44 7xx xxx xxx',
+    back:         '← Back',
+    confirmBtn:   'Confirm',
+    successTitle: 'Booking confirmed!',
+    successNote:  'You will receive a confirmation SMS.',
+    retry:        '↺ Try again',
+    bookings:     'bookings',
+  };
   const [step, setStep]             = useState('slots');
   const [selected, setSelected]     = useState(null);
   const [clientName, setClientName] = useState('');
@@ -99,8 +119,8 @@ function InteractiveMockup({ lang = 'ro' }) {
         <div className="l-mock-card">
           {step === 'slots' && (
             <>
-              <div className="l-mock-label">Pagina ta de booking</div>
-              <div className="l-mock-title">Selectează o oră</div>
+              <div className="l-mock-label">{L.bookingPage}</div>
+              <div className="l-mock-title">{L.selectHour}</div>
               {SLOTS.map((slot, i) => (
                 <div
                   key={i}
@@ -110,7 +130,7 @@ function InteractiveMockup({ lang = 'ro' }) {
                 >
                   <span className="l-mock-slot-time">{slot.time}</span>
                   <span className="l-mock-slot-info">
-                    <span className="l-mock-slot-svc">{slot.taken ? 'Ocupat' : slot.service}</span>
+                    <span className="l-mock-slot-svc">{slot.taken ? L.taken : slot.service}</span>
                     {!slot.taken && <span className="l-mock-slot-meta">{slot.name} · {slot.duration}</span>}
                   </span>
                   {!slot.taken && <span className="l-mock-slot-arrow">→</span>}
@@ -121,7 +141,7 @@ function InteractiveMockup({ lang = 'ro' }) {
 
           {step === 'form' && (
             <>
-              <div className="l-mock-label">Confirmă programarea</div>
+              <div className="l-mock-label">{L.confirmAppt}</div>
               <div className="l-mock-confirm-slot">
                 <span className="l-mock-confirm-time">{selected.time}</span>
                 <span>
@@ -131,32 +151,32 @@ function InteractiveMockup({ lang = 'ro' }) {
               </div>
               <div className="l-mock-form">
                 <div className="l-mock-field">
-                  <label>Numele tău</label>
+                  <label>{L.yourName}</label>
                   <input
                     type="text"
-                    placeholder="ex. Ioana Popescu"
+                    placeholder={L.namePh}
                     value={clientName}
                     onChange={e => setClientName(e.target.value)}
                     maxLength={40}
                   />
                 </div>
                 <div className="l-mock-field">
-                  <label>Telefon</label>
+                  <label>{L.phone}</label>
                   <input
                     type="tel"
-                    placeholder="07xx xxx xxx"
+                    placeholder={L.phonePh}
                     value={clientPhone}
                     onChange={e => setClientPhone(e.target.value)}
                     maxLength={15}
                   />
                 </div>
                 <div className="l-mock-form-actions">
-                  <button className="l-mock-back" onClick={() => setStep('slots')}>← Înapoi</button>
+                  <button className="l-mock-back" onClick={() => setStep('slots')}>{L.back}</button>
                   <button
                     className={`l-mock-submit${clientName && clientPhone ? ' ready' : ''}`}
                     onClick={handleConfirm}
                   >
-                    Confirmă
+                    {L.confirmBtn}
                   </button>
                 </div>
               </div>
@@ -166,12 +186,12 @@ function InteractiveMockup({ lang = 'ro' }) {
           {step === 'success' && (
             <div className="l-mock-success">
               <div className="l-mock-success-icon">✓</div>
-              <div className="l-mock-success-title">Programare confirmată!</div>
+              <div className="l-mock-success-title">{L.successTitle}</div>
               <div className="l-mock-success-detail">{selected.time} · {selected.service}</div>
               <div className="l-mock-success-detail">{clientName} · {clientPhone}</div>
-              <div className="l-mock-success-note">Vei primi un SMS de confirmare.</div>
+              <div className="l-mock-success-note">{L.successNote}</div>
               <button className="l-mock-back" onClick={handleReset} style={{ marginTop: 20 }}>
-                ↺ Încearcă din nou
+                {L.retry}
               </button>
             </div>
           )}
@@ -179,13 +199,13 @@ function InteractiveMockup({ lang = 'ro' }) {
 
         {/* ── DREAPTA: dashboard live ── */}
         <div className="l-mock-card">
-          <div className="l-mock-label">Dashboard salon · Azi</div>
-          <div className="l-mock-title">{`${bookings.length} ${bookingsLabel}`}</div>
+          <div className="l-mock-label">{L.dashboard}</div>
+          <div className="l-mock-title">{`${bookings.length} ${L.bookings}`}</div>
           {bookings.map((b, i) => (
             <div key={i} className={`l-mock-row${b.isNew ? ' l-mock-row-new' : ''}`}>
               <span className="l-mock-row-name">{b.name} · {b.service}</span>
               <span className={`l-mock-status ${b.status === 'confirmed' ? 'l-status-confirmed' : 'l-status-pending'}`}>
-                {b.status === 'confirmed' ? 'Confirmat' : 'În așteptare'}
+                {b.status === 'confirmed' ? labelConfirmed : labelPending}
               </span>
             </div>
           ))}
@@ -349,10 +369,6 @@ export default function LandingScreen() {
       {/* ─── HERO ─── */}
       <section className="l-hero">
         <div className="l-hero-lines" />
-
-        <div className="l-hero-badge">
-          {t.badge}
-        </div>
 
         <h1 className="l-hero-title">
           {lang === 'ro' ? (
