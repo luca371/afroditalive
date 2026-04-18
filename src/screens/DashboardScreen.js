@@ -11,7 +11,7 @@ import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
 import UpgradeModal from '../components/UpgradeModal';
 import './DashboardScreen.css';
 
-const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Setări'];
+const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Statistici', 'Setări'];
 
 export default function DashboardScreen() {
   const { user, salon, setSalon, logout } = useAuth();
@@ -160,6 +160,7 @@ export default function DashboardScreen() {
               {v === 'Azi'        && <IconToday />}
               {v === 'Programări' && <IconList />}
               {v === 'Săptămână'  && <IconCalendar />}
+              {v === 'Statistici' && <IconStats />}
               {v === 'Setări'     && <IconSettings />}
               {v}
             </button>
@@ -194,6 +195,7 @@ export default function DashboardScreen() {
             )}
             {view === 'Programări' && <h1>Toate programările</h1>}
             {view === 'Săptămână'  && <h1>Calendar săptămânal</h1>}
+            {view === 'Statistici' && <h1>Statistici</h1>}
             {view === 'Setări'     && <h1>Setări salon</h1>}
           </div>
           <CopyLinkButton slug={salon?.slug} />
@@ -344,6 +346,11 @@ export default function DashboardScreen() {
           </div>
         )}
 
+        {/* ── VIEW: STATISTICI ── */}
+        {view === 'Statistici' && (
+          <StatsView bookings={bookings} salon={salon} onUpgrade={() => setShowUpgrade(true)} />
+        )}
+
         {/* ── VIEW: SETĂRI ── */}
         {view === 'Setări' && (
           <SettingsView user={user} salon={salon} setSalon={setSalon} navigate={navigate} onUpgrade={() => setShowUpgrade(true)} />
@@ -373,6 +380,254 @@ function UpgradeBanner() {
     <div className="db-upgrade-success">
       Planul tău a fost actualizat cu succes. Mulțumim.
     </div>
+  );
+}
+
+// ── Stats View ──
+function StatsView({ bookings, salon, onUpgrade }) {
+  const [period, setPeriod] = useState(30);
+
+  const now   = new Date();
+  const today = now.toISOString().split('T')[0];
+
+  // Date range
+  const startDate = new Date(now);
+  startDate.setDate(startDate.getDate() - period);
+  const startStr = startDate.toISOString().split('T')[0];
+
+  const filtered = bookings.filter(b => b.date >= startStr && b.date <= today);
+  const confirmed = filtered.filter(b => b.status === 'confirmed');
+  const cancelled = filtered.filter(b => b.status === 'cancelled');
+  const pending   = filtered.filter(b => b.status === 'pending');
+
+  // Venit estimat
+  const revenue = confirmed.reduce((sum, b) => sum + (parseFloat(b.price) || 0), 0);
+
+  // Top servicii
+  const serviceCount = {};
+  filtered.forEach(b => {
+    if (b.serviceName) serviceCount[b.serviceName] = (serviceCount[b.serviceName] || 0) + 1;
+  });
+  const topServices = Object.entries(serviceCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  // Top angajați
+  const empCount = {};
+  filtered.forEach(b => {
+    if (b.employeeName) empCount[b.employeeName] = (empCount[b.employeeName] || 0) + 1;
+  });
+  const topEmployees = Object.entries(empCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  // Grafic ultimele zile
+  const chartDays = period <= 30 ? period : 30;
+  const chartData = Array.from({ length: chartDays }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - (chartDays - 1 - i));
+    const dateStr = d.toISOString().split('T')[0];
+    const count = bookings.filter(b => b.date === dateStr && b.status !== 'cancelled').length;
+    const label = d.toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' });
+    return { dateStr, count, label };
+  });
+  const maxCount = Math.max(...chartData.map(d => d.count), 1);
+
+  // Rata confirmare
+  const confirmRate = filtered.length > 0
+    ? Math.round((confirmed.length / filtered.length) * 100)
+    : 0;
+
+  // Ore populare
+  const hourCount = {};
+  filtered.forEach(b => {
+    if (b.timeSlot) {
+      const h = b.timeSlot.split(':')[0] + ':00';
+      hourCount[h] = (hourCount[h] || 0) + 1;
+    }
+  });
+  const topHours = Object.entries(hourCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+  // Zile populare
+  const dayNames = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
+  const dayCount = {};
+  filtered.forEach(b => {
+    if (b.date) {
+      const day = dayNames[new Date(b.date + 'T12:00:00').getDay()];
+      dayCount[day] = (dayCount[day] || 0) + 1;
+    }
+  });
+  const topDay = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0];
+
+  return (
+    <div className="db-content db-stats-view">
+
+      {/* Period selector */}
+      <div className="db-stats-toolbar">
+        {[7, 30, 90].map(p => (
+          <button
+            key={p}
+            className={`db-stats-period ${period === p ? 'active' : ''}`}
+            onClick={() => setPeriod(p)}
+          >
+            {p === 7 ? 'Ultima săptămână' : p === 30 ? 'Ultima lună' : 'Ultimele 3 luni'}
+          </button>
+        ))}
+      </div>
+
+      {/* KPI Cards */}
+      <div className="db-kpi-grid">
+        <div className="db-kpi">
+          <span className="db-kpi-num">{filtered.length}</span>
+          <span className="db-kpi-label">Total programări</span>
+        </div>
+        <div className="db-kpi">
+          <span className="db-kpi-num db-kpi-green">{confirmed.length}</span>
+          <span className="db-kpi-label">Confirmate</span>
+        </div>
+        <div className="db-kpi">
+          <span className="db-kpi-num db-kpi-rose">{cancelled.length}</span>
+          <span className="db-kpi-label">Anulate</span>
+        </div>
+        <div className="db-kpi">
+          <span className="db-kpi-num">{pending.length}</span>
+          <span className="db-kpi-label">În așteptare</span>
+        </div>
+        <div className="db-kpi">
+          <span className="db-kpi-num db-kpi-rose">{confirmRate}%</span>
+          <span className="db-kpi-label">Rată confirmare</span>
+        </div>
+        {revenue > 0 && (
+          <div className="db-kpi">
+            <span className="db-kpi-num db-kpi-green">{revenue} lei</span>
+            <span className="db-kpi-label">Venit estimat</span>
+          </div>
+        )}
+      </div>
+
+      {/* Chart */}
+      <div className="db-chart-section">
+        <div className="db-chart-title">Programări pe zile</div>
+        <div className="db-chart">
+          {chartData.map((d, i) => (
+            <div key={i} className="db-chart-col">
+              <div className="db-chart-bar-wrap">
+                <div
+                  className="db-chart-bar"
+                  style={{ height: `${(d.count / maxCount) * 100}%` }}
+                  title={`${d.label}: ${d.count} programări`}
+                >
+                  {d.count > 0 && <span className="db-chart-val">{d.count}</span>}
+                </div>
+              </div>
+              {(i === 0 || i === Math.floor(chartDays / 2) || i === chartDays - 1) && (
+                <span className="db-chart-label">{d.label}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom grid */}
+      <div className="db-stats-bottom">
+
+        {/* Top servicii */}
+        <div className="db-stats-card">
+          <div className="db-stats-card-title">Top servicii</div>
+          {topServices.length === 0 ? (
+            <p className="db-stats-empty">Fără date încă.</p>
+          ) : topServices.map(([name, count], i) => (
+            <div key={i} className="db-stats-row">
+              <span className="db-stats-row-name">{name}</span>
+              <div className="db-stats-bar-wrap">
+                <div
+                  className="db-stats-bar"
+                  style={{ width: `${(count / topServices[0][1]) * 100}%` }}
+                />
+              </div>
+              <span className="db-stats-row-count">{count}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Top angajați */}
+        <div className="db-stats-card">
+          <div className="db-stats-card-title">Top angajați</div>
+          {topEmployees.length === 0 ? (
+            <p className="db-stats-empty">Fără date încă.</p>
+          ) : topEmployees.map(([name, count], i) => (
+            <div key={i} className="db-stats-row">
+              <span className="db-stats-row-name">{name}</span>
+              <div className="db-stats-bar-wrap">
+                <div
+                  className="db-stats-bar db-stats-bar-emp"
+                  style={{ width: `${(count / topEmployees[0][1]) * 100}%` }}
+                />
+              </div>
+              <span className="db-stats-row-count">{count}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Insights */}
+        <div className="db-stats-card">
+          <div className="db-stats-card-title">Insights</div>
+          <div className="db-insights">
+            {topDay && (
+              <div className="db-insight">
+                <span className="db-insight-icon">📅</span>
+                <div>
+                  <div className="db-insight-val">{topDay[0]}</div>
+                  <div className="db-insight-label">Ziua cea mai aglomerată</div>
+                </div>
+              </div>
+            )}
+            {topHours[0] && (
+              <div className="db-insight">
+                <span className="db-insight-icon">🕐</span>
+                <div>
+                  <div className="db-insight-val">{topHours[0][0]}</div>
+                  <div className="db-insight-label">Ora cea mai cerută</div>
+                </div>
+              </div>
+            )}
+            {filtered.length > 0 && (
+              <div className="db-insight">
+                <span className="db-insight-icon">📈</span>
+                <div>
+                  <div className="db-insight-val">
+                    {(filtered.length / period).toFixed(1)}/zi
+                  </div>
+                  <div className="db-insight-label">Medie zilnică</div>
+                </div>
+              </div>
+            )}
+            {cancelled.length > 0 && filtered.length > 0 && (
+              <div className="db-insight">
+                <span className="db-insight-icon">❌</span>
+                <div>
+                  <div className="db-insight-val">
+                    {Math.round((cancelled.length / filtered.length) * 100)}%
+                  </div>
+                  <div className="db-insight-label">Rată anulare</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+function IconStats() {
+  return (
+    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+      <path d="M18 20V10M12 20V4M6 20v-6"/>
+    </svg>
   );
 }
 
