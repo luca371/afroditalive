@@ -2,22 +2,55 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LandingScreen.css';
 
-const SLOTS = [
+const SLOTS_RO = [
   { time: '10:00', name: 'Andreea', service: 'Vopsit + tratament', duration: '2h',    taken: false },
   { time: '11:30', name: 'Diana',   service: 'Tuns + coafat',       duration: '1h',    taken: false },
   { time: '13:00', name: 'Andreea', service: 'Manichiură gel',       duration: '1h',    taken: false },
   { time: '14:30', name: 'Diana',   service: 'Coafat ocazie',        duration: '1h30',  taken: false },
   { time: '16:00', name: 'Andreea', service: 'Tuns + tratament',     duration: '1h30',  taken: true  },
 ];
+const SLOTS_EN = [
+  { time: '10:00', name: 'Emma',  service: 'Color + treatment', duration: '2h',    taken: false },
+  { time: '11:30', name: 'Diana', service: 'Haircut + blowdry', duration: '1h',    taken: false },
+  { time: '13:00', name: 'Emma',  service: 'Gel manicure',      duration: '1h',    taken: false },
+  { time: '14:30', name: 'Diana', service: 'Event styling',     duration: '1h30',  taken: false },
+  { time: '16:00', name: 'Emma',  service: 'Haircut',           duration: '1h30',  taken: true  },
+];
 
-const INITIAL_BOOKINGS = [
+const BOOKINGS_RO = [
   { name: 'Maria P.',  service: 'Vopsit',     status: 'confirmed' },
   { name: 'Elena D.',  service: 'Tuns',        status: 'confirmed' },
   { name: 'Ioana C.',  service: 'Manichiură', status: 'pending'   },
   { name: 'Ana M.',    service: 'Tratament',   status: 'pending'   },
 ];
+const BOOKINGS_EN = [
+  { name: 'Sarah K.',  service: 'Color',     status: 'confirmed' },
+  { name: 'Emma L.',   service: 'Haircut',   status: 'confirmed' },
+  { name: 'Laura M.',  service: 'Manicure',  status: 'pending'   },
+  { name: 'Anna P.',   service: 'Treatment', status: 'pending'   },
+];
 
-function InteractiveMockup() {
+function InteractiveMockup({ lang = 'ro' }) {
+  const SLOTS = lang === 'ro' ? SLOTS_RO : SLOTS_EN;
+  const INITIAL_BOOKINGS = lang === 'ro' ? BOOKINGS_RO : BOOKINGS_EN;
+
+  const labelBookingPage  = lang === 'ro' ? '{labelBookingPage}'  : 'Your booking page';
+  const labelSelectHour   = lang === 'ro' ? '{labelSelectHour}'      : 'Select a time';
+  const labelDashboard    = lang === 'ro' ? '{labelDashboard}' : 'Salon dashboard · Today';
+  const labelConfirmed    = lang === 'ro' ? 'Confirmat'             : 'Confirmed';
+  const labelPending      = lang === 'ro' ? 'În așteptare'          : 'Pending';
+  const labelTaken        = lang === 'ro' ? {labelTaken}                : 'Taken';
+  const labelConfirmAppt  = lang === 'ro' ? '{labelConfirmAppt}'  : 'Confirm booking';
+  const labelYourName     = lang === 'ro' ? '{labelYourName}'            : 'Your name';
+  const labelPhone        = lang === 'ro' ? '{labelPhone}'               : 'Phone';
+  const labelNamePh       = lang === 'ro' ? '{labelNamePh}'     : 'e.g. Sarah Johnson';
+  const labelPhonePh      = lang === 'ro' ? '{labelPhonePh}'          : '+44 7xx xxx xxx';
+  const labelBack         = lang === 'ro' ? {labelBack}              : '← Back';
+  const labelConfirmBtn   = lang === 'ro' ? 'Confirmă'              : 'Confirm';
+  const labelSuccessTitle = lang === 'ro' ? '{labelSuccessTitle}' : 'Booking confirmed!';
+  const labelSuccessNote  = lang === 'ro' ? '{labelSuccessNote}' : 'You will receive a confirmation SMS.';
+  const labelRetry        = lang === 'ro' ? '{labelRetry}'    : '↺ Try again';
+  const bookingsLabel     = lang === 'ro' ? 'programări'            : 'bookings';
   const [step, setStep]             = useState('slots');
   const [selected, setSelected]     = useState(null);
   const [clientName, setClientName] = useState('');
@@ -147,7 +180,7 @@ function InteractiveMockup() {
         {/* ── DREAPTA: dashboard live ── */}
         <div className="l-mock-card">
           <div className="l-mock-label">Dashboard salon · Azi</div>
-          <div className="l-mock-title">{bookings.length} programări</div>
+          <div className="l-mock-title">{`${bookings.length} ${bookingsLabel}`}</div>
           {bookings.map((b, i) => (
             <div key={i} className={`l-mock-row${b.isNew ? ' l-mock-row-new' : ''}`}>
               <span className="l-mock-row-name">{b.name} · {b.service}</span>
@@ -353,7 +386,7 @@ export default function LandingScreen() {
       {/* ─── PREVIEW MOCKUP ─── */}
       <section className="l-preview">
         <div className="l-preview-inner">
-          <InteractiveMockup />
+          <InteractiveMockup lang={lang} />
         </div>
       </section>
 
