@@ -50,7 +50,7 @@ function InteractiveMockup({ lang = 'ro' }) {
     confirmBtn:   'Confirmă',
     successTitle: 'Programare confirmată!',
     successNote:  'Vei primi un SMS de confirmare.',
-    retry:        '{L.retry}',
+    retry:        '↺ Încearcă din nou',
     bookings:     'programări',
   } : {
     bookingPage:  'Your booking page',
@@ -205,7 +205,7 @@ function InteractiveMockup({ lang = 'ro' }) {
             <div key={i} className={`l-mock-row${b.isNew ? ' l-mock-row-new' : ''}`}>
               <span className="l-mock-row-name">{b.name} · {b.service}</span>
               <span className={`l-mock-status ${b.status === 'confirmed' ? 'l-status-confirmed' : 'l-status-pending'}`}>
-                {b.status === 'confirmed' ? labelConfirmed : labelPending}
+                {b.status === 'confirmed' ? L.confirmed : L.pending}
               </span>
             </div>
           ))}
@@ -250,14 +250,14 @@ const T = {
       { name: 'Pro', price: '45', period: 'Facturare lunară', features: ['10 angajați', 'Programări nelimitate', 'Email confirmări automate', 'Statistici avansate', 'Prioritate la suport'], cta: 'Alege Pro', badge: 'Cel mai ales', featured: true },
       { name: 'Business', price: '99', period: 'Facturare lunară', features: ['Angajați nelimitați', 'Mai multe locații', 'Email confirmări incluse', 'Onboarding dedicat', 'Integrare site propriu'], cta: 'Alege Business' },
     ],
-    quote: '{t.quote}',
-    quoteAuthor: '{t.quoteAuthor}',
+    quote: '„De când am Afrodita, nu mai pierd timp la telefon. Clientele se programează singure, chiar și duminica la miezul nopții."',
+    quoteAuthor: 'Andreea M. · Studio Lumière, București',
     ctaTitle1: 'Pregătit să transformi', ctaTitle2: 'salonul tău?',
     ctaSub: 'Gratuit pentru totdeauna. Fără card bancar.',
-    ctaBtn: '{t.ctaBtn}',
-    ctaNote: '{t.ctaNote}',
+    ctaBtn: 'Creează contul gratuit',
+    ctaNote: 'Îl configurezi complet în mai puțin de 30 de minute',
     footerTerms: 'Termeni', footerPrivacy: 'Confidențialitate', footerContact: 'Contact',
-    footerCopy: '{t.footerCopy}',
+    footerCopy: '© 2025 Afroditalive. Construit în România.',
     currency: 'lei/lună',
   },
   en: {
@@ -369,6 +369,10 @@ export default function LandingScreen() {
       {/* ─── HERO ─── */}
       <section className="l-hero">
         <div className="l-hero-lines" />
+
+        <div className="l-hero-badge">
+          {t.badge}
+        </div>
 
         <h1 className="l-hero-title">
           {lang === 'ro' ? (
