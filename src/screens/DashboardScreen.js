@@ -450,11 +450,17 @@ export default function DashboardScreen() {
                           className={`db-cal-cell ${isDropTarget ? 'db-cal-drop-target' : ''}`}
                           onDragOver={e => {
                             e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                            setDropTarget({ date: dateStr, hour });
+                          }}
+                          onDragEnter={e => {
+                            e.preventDefault();
                             setDropTarget({ date: dateStr, hour });
                           }}
                           onDragLeave={() => setDropTarget(null)}
                           onDrop={e => {
                             e.preventDefault();
+                            e.stopPropagation();
                             if (dragInfo) handleDrop(dragInfo, dateStr, hour);
                             setDropTarget(null);
                             setDragInfo(null);
@@ -464,10 +470,18 @@ export default function DashboardScreen() {
                             <div
                               key={b.id}
                               className={`db-cal-event ${statusClass[b.status]} ${b.status !== 'cancelled' ? 'db-cal-event-draggable' : ''} ${dragInfo?.id === b.id ? 'db-cal-event-dragging' : ''}`}
-                              title={`${b.clientName} · ${b.serviceName}`}
+                              title={b.status !== 'cancelled' ? 'Trage pentru a reprograma' : b.clientName}
                               draggable={b.status !== 'cancelled'}
-                              onDragStart={() => b.status !== 'cancelled' && setDragInfo(b)}
-                              onDragEnd={() => { setDragInfo(null); setDropTarget(null); }}
+                              onDragStart={e => {
+                                if (b.status === 'cancelled') { e.preventDefault(); return; }
+                                e.dataTransfer.effectAllowed = 'move';
+                                e.dataTransfer.setData('text/plain', b.id);
+                                setTimeout(() => setDragInfo(b), 0);
+                              }}
+                              onDragEnd={() => {
+                                setDragInfo(null);
+                                setDropTarget(null);
+                              }}
                             >
                               <span className="db-cal-event-time">{b.timeSlot}</span>
                               <span className="db-cal-event-name">{b.clientName}</span>
