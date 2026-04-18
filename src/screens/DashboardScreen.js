@@ -388,14 +388,6 @@ function UpgradeBanner() {
 }
 
 // ── Stats View ──
-const CHART_COLORS = {
-  confirmed: '#5de07a',
-  pending:   '#C9A87C',
-  cancelled: '#f07a7a',
-  bar:       '#C9A87C',
-  line:      '#C9A87C',
-};
-
 const PIE_COLORS = ['#C9A87C', '#5de07a', '#f07a7a', '#7a9cf0', '#c07af0'];
 
 function CustomTooltip({ active, payload, label }) {
