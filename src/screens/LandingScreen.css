@@ -816,6 +816,8 @@ html { scroll-behavior: smooth; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 .l-footer-logo {
   font-family: var(--serif);
@@ -833,6 +835,7 @@ html { scroll-behavior: smooth; }
   display: flex;
   gap: 28px;
   list-style: none;
+  flex-wrap: wrap;
 }
 .l-footer-links a {
   font-size: 12px;
