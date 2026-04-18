@@ -59,6 +59,11 @@ export default function DashboardScreen() {
       cancelled: 'Din păcate, programarea ta a fost anulată de salon. Te rugăm să contactezi salonul pentru a reprograma.',
     };
 
+    const statuses = {
+      confirmed: 'Confirmare',
+      cancelled: 'Anulare',
+    };
+
     if (!messages[status]) return;
 
     try {
@@ -67,6 +72,7 @@ export default function DashboardScreen() {
         email:         booking.clientEmail,
         time:          booking.timeSlot,
         message:       messages[status],
+        status:        statuses[status],
         client_name:   booking.clientName,
         client_email:  booking.clientEmail,
         salon_name:    salon?.name || '',
@@ -193,11 +199,7 @@ export default function DashboardScreen() {
         </header>
 
         {/* Banner upgrade success */}
-        {window.location.search.includes('upgrade=success') && (
-          <div className="db-upgrade-success">
-            🎉 Planul tău a fost upgrades cu succes! Mulțumim.
-          </div>
-        )}
+        {window.location.search.includes('upgrade=success') && <UpgradeBanner />}
 
         {/* ── VIEW: AZI ── */}
         {view === 'Azi' && (
@@ -352,6 +354,23 @@ export default function DashboardScreen() {
 
       {/* Upgrade modal */}
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+    </div>
+  );
+}
+
+function UpgradeBanner() {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(false), 5000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div className="db-upgrade-success">
+      Planul tău a fost actualizat cu succes. Mulțumim.
     </div>
   );
 }
