@@ -28,6 +28,9 @@ export default function DashboardScreen() {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [dragInfo, setDragInfo]   = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
+  const [editMode, setEditMode]   = useState(false);
+  const [pendingMoves, setPendingMoves] = useState({}); // { bookingId: { newDate, newHour, oldDate, oldTimeSlot } }
+  const [saving, setSaving]       = useState(false);
 
   // Fetch bookings in real-time
   useEffect(() => {
@@ -122,85 +125,106 @@ export default function DashboardScreen() {
     }
   }
 
-  async function handleDrop(booking, newDate, newHour) {
+  function handleDrop(booking, newDate, newHour) {
     if (!booking || !newDate || !newHour) return;
-    const newTimeSlot = newHour; // e.g. "14:00"
+    if (booking.date === newDate && booking.timeSlot === newHour) return;
 
-    // Dacă e aceeași dată și oră — nu facem nimic
-    if (booking.date === newDate && booking.timeSlot === newTimeSlot) return;
+    // Salvează mutarea ca pending — nu în Firestore încă
+    setPendingMoves(prev => ({
+      ...prev,
+      [booking.id]: {
+        newDate,
+        newHour,
+        oldDate:     booking.date,
+        oldTimeSlot: booking.timeSlot,
+        booking,
+      },
+    }));
+  }
 
-    try {
-      // Actualizează în Firestore
-      await updateDoc(doc(db, 'bookings', booking.id), {
-        date:     newDate,
-        timeSlot: newTimeSlot,
-        movedAt:  new Date().toISOString(),
-        movedBy:  'admin',
-      });
+  async function handleSaveMoves() {
+    if (Object.keys(pendingMoves).length === 0) return;
+    setSaving(true);
 
-      const oldDateFormatted = formatDateFromStr(booking.date);
-      const newDateFormatted = formatDateFromStr(newDate);
+    for (const [bookingId, move] of Object.entries(pendingMoves)) {
+      const { newDate, newHour, oldDate, oldTimeSlot, booking } = move;
+      try {
+        await updateDoc(doc(db, 'bookings', bookingId), {
+          date:     newDate,
+          timeSlot: newHour,
+          movedAt:  new Date().toISOString(),
+          movedBy:  'admin',
+        });
 
-      // Trimite email
-      const serviceId  = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-      const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-      const publicKey  = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+        const oldDateFormatted = formatDateFromStr(oldDate);
+        const newDateFormatted = formatDateFromStr(newDate);
 
-      if (serviceId && templateId && publicKey && booking.clientEmail) {
-        const cancelUrl = `${window.location.origin}/cancel/${booking.id}`;
-        try {
-          await emailjs.send(serviceId, templateId, {
-            name:          booking.clientName,
-            email:         booking.clientEmail,
-            time:          newTimeSlot,
-            message:       `Programarea ta a fost reprogramată. Noua dată: ${newDateFormatted} la ${newTimeSlot} (anterior: ${oldDateFormatted} la ${booking.timeSlot}).`,
-            status:        'Reprogramat',
-            messagecancel: 'Dacă dorești să anulezi programarea, apasă aici:',
-            client_name:   booking.clientName,
-            client_email:  booking.clientEmail,
-            salon_name:    salon?.name || '',
-            service_name:  booking.serviceName,
-            employee_name: booking.employeeName,
-            date:          newDateFormatted,
-            time_slot:     newTimeSlot,
-            duration:      booking.duration,
-            price:         booking.price || '',
-            address:       salon?.address ? `${salon.address}, ${salon.city}` : '',
-            phone:         salon?.phone || '',
-            cancel_url:    cancelUrl,
-          }, publicKey);
-        } catch {
-          console.warn('Email reprogramare nu a putut fi trimis.');
+        // Email
+        const serviceId  = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+        const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+        const publicKey  = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+
+        if (serviceId && templateId && publicKey && booking.clientEmail) {
+          const cancelUrl = `${window.location.origin}/cancel/${bookingId}`;
+          try {
+            await emailjs.send(serviceId, templateId, {
+              name:          booking.clientName,
+              email:         booking.clientEmail,
+              time:          newHour,
+              message:       `Programarea ta a fost reprogramată. Noua dată: ${newDateFormatted} la ${newHour} (anterior: ${oldDateFormatted} la ${oldTimeSlot}).`,
+              status:        'Reprogramat',
+              messagecancel: 'Dacă dorești să anulezi programarea, apasă aici:',
+              client_name:   booking.clientName,
+              client_email:  booking.clientEmail,
+              salon_name:    salon?.name || '',
+              service_name:  booking.serviceName,
+              employee_name: booking.employeeName,
+              date:          newDateFormatted,
+              time_slot:     newHour,
+              duration:      booking.duration,
+              price:         booking.price || '',
+              address:       salon?.address ? `${salon.address}, ${salon.city}` : '',
+              phone:         salon?.phone || '',
+              cancel_url:    cancelUrl,
+            }, publicKey);
+          } catch { console.warn('Email reprogramare eșuat.'); }
         }
-      }
 
-      // Trimite SMS
-      if (booking.clientPhone) {
-        try {
-          await fetch('/api/send-sms', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              phone:        booking.clientPhone,
-              serviceName:  booking.serviceName,
-              employeeName: booking.employeeName,
-              date:         newDateFormatted,
-              timeSlot:     newTimeSlot,
-              status:       'rescheduled',
-              cancelUrl:    `${window.location.origin}/cancel/${booking.id}`,
-              salonName:    salon?.name || '',
-              oldDate:      oldDateFormatted,
-              oldTimeSlot:  booking.timeSlot,
-            }),
-          });
-        } catch {
-          console.warn('SMS reprogramare nu a putut fi trimis.');
+        // SMS
+        if (booking.clientPhone) {
+          try {
+            await fetch('/api/send-sms', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                phone:        booking.clientPhone,
+                serviceName:  booking.serviceName,
+                employeeName: booking.employeeName,
+                date:         formatDateFromStr(newDate),
+                timeSlot:     newHour,
+                status:       'rescheduled',
+                cancelUrl:    `${window.location.origin}/cancel/${bookingId}`,
+                salonName:    salon?.name || '',
+              }),
+            });
+          } catch { console.warn('SMS reprogramare eșuat.'); }
         }
-      }
 
-    } catch (err) {
-      console.error('Eroare la mutare programare:', err);
+      } catch (err) {
+        console.error('Eroare salvare mutare:', err);
+      }
     }
+
+    setPendingMoves({});
+    setEditMode(false);
+    setSaving(false);
+  }
+
+  function handleCancelEdit() {
+    setPendingMoves({});
+    setEditMode(false);
+    setDragInfo(null);
+    setDropTarget(null);
   }
 
   async function handleLogout() {
@@ -413,6 +437,35 @@ export default function DashboardScreen() {
                 <button onClick={() => setWeekOffset(o => o + 1)}>Următor ›</button>
               </div>
 
+              {/* Edit mode toolbar */}
+              {!editMode ? (
+                <div className="db-cal-edit-bar">
+                  <button className="db-cal-edit-btn" onClick={() => setEditMode(true)}>
+                    ✎ Editează calendar
+                  </button>
+                </div>
+              ) : (
+                <div className="db-cal-edit-bar db-cal-edit-bar-active">
+                  <span className="db-cal-edit-hint">
+                    {Object.keys(pendingMoves).length === 0
+                      ? 'Trage programările pe noile ore'
+                      : `${Object.keys(pendingMoves).length} modificare${Object.keys(pendingMoves).length > 1 ? 'i' : ''} nesalvată${Object.keys(pendingMoves).length > 1 ? 'te' : ''}`}
+                  </span>
+                  <div className="db-cal-edit-actions">
+                    <button className="db-cal-discard-btn" onClick={handleCancelEdit}>
+                      Renunță
+                    </button>
+                    <button
+                      className="db-cal-save-btn"
+                      onClick={handleSaveMoves}
+                      disabled={Object.keys(pendingMoves).length === 0 || saving}
+                    >
+                      {saving ? 'Se salvează...' : `Salvează${Object.keys(pendingMoves).length > 0 ? ` (${Object.keys(pendingMoves).length})` : ''}`}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {dragInfo && (
                 <div className="db-cal-drag-hint">
                   Muți programarea lui <strong>{dragInfo.clientName}</strong> — trage pe noua oră
@@ -440,8 +493,14 @@ export default function DashboardScreen() {
                     <div className="db-cal-time">{hour}</div>
                     {weekDays.map((d, i) => {
                       const dateStr = d.toISOString().split('T')[0];
-                      const dayBookings = bookingsForDay(d).filter(b =>
-                        b.timeSlot && b.timeSlot.startsWith(hour.substring(0, 2))
+                      // Aplică pending moves pentru preview
+                      const effectiveBookings = bookingsForDay(d).map(b => {
+                        const move = pendingMoves[b.id];
+                        if (move) return { ...b, date: move.newDate, timeSlot: move.newHour, isPending: true };
+                        return b;
+                      });
+                      const dayBookings = effectiveBookings.filter(b =>
+                        b.timeSlot && b.timeSlot.startsWith(hour.substring(0, 2)) && b.date === dateStr
                       );
                       const isDropTarget = dragInfo && dropTarget?.date === dateStr && dropTarget?.hour === hour;
                       return (
@@ -449,16 +508,19 @@ export default function DashboardScreen() {
                           key={i}
                           className={`db-cal-cell ${isDropTarget ? 'db-cal-drop-target' : ''}`}
                           onDragOver={e => {
+                            if (!editMode) return;
                             e.preventDefault();
                             e.dataTransfer.dropEffect = 'move';
                             setDropTarget({ date: dateStr, hour });
                           }}
                           onDragEnter={e => {
+                            if (!editMode) return;
                             e.preventDefault();
                             setDropTarget({ date: dateStr, hour });
                           }}
                           onDragLeave={() => setDropTarget(null)}
                           onDrop={e => {
+                            if (!editMode) return;
                             e.preventDefault();
                             e.stopPropagation();
                             if (dragInfo) handleDrop(dragInfo, dateStr, hour);
@@ -469,14 +531,16 @@ export default function DashboardScreen() {
                           {dayBookings.map(b => (
                             <div
                               key={b.id}
-                              className={`db-cal-event ${statusClass[b.status]} ${b.status !== 'cancelled' ? 'db-cal-event-draggable' : ''} ${dragInfo?.id === b.id ? 'db-cal-event-dragging' : ''}`}
-                              title={b.status !== 'cancelled' ? 'Trage pentru a reprograma' : b.clientName}
-                              draggable={b.status !== 'cancelled'}
+                              className={`db-cal-event ${statusClass[b.status]} ${editMode && b.status !== 'cancelled' ? 'db-cal-event-draggable' : ''} ${dragInfo?.id === b.id ? 'db-cal-event-dragging' : ''} ${b.isPending ? 'db-cal-event-pending' : ''}`}
+                              title={editMode && b.status !== 'cancelled' ? 'Trage pentru a reprograma' : `${b.clientName} · ${b.serviceName}`}
+                              draggable={editMode && b.status !== 'cancelled'}
                               onDragStart={e => {
-                                if (b.status === 'cancelled') { e.preventDefault(); return; }
+                                if (!editMode || b.status === 'cancelled') { e.preventDefault(); return; }
                                 e.dataTransfer.effectAllowed = 'move';
                                 e.dataTransfer.setData('text/plain', b.id);
-                                setTimeout(() => setDragInfo(b), 0);
+                                // Găsim booking-ul original pentru a păstra oldDate/oldTimeSlot
+                                const original = bookings.find(ob => ob.id === b.id);
+                                setTimeout(() => setDragInfo(original || b), 0);
                               }}
                               onDragEnd={() => {
                                 setDragInfo(null);
@@ -485,6 +549,7 @@ export default function DashboardScreen() {
                             >
                               <span className="db-cal-event-time">{b.timeSlot}</span>
                               <span className="db-cal-event-name">{b.clientName}</span>
+                              {b.isPending && <span className="db-cal-event-pending-dot">●</span>}
                             </div>
                           ))}
                         </div>

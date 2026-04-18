@@ -1083,3 +1083,79 @@
   text-align: center;
   animation: fadeIn 0.2s ease;
 }
+
+/* ── EDIT MODE CALENDAR ── */
+.db-cal-edit-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  margin-bottom: 8px;
+}
+.db-cal-edit-btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(250,247,242,0.5);
+  background: none;
+  border: 1px solid rgba(201,168,124,0.2);
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.db-cal-edit-btn:hover {
+  color: var(--rose);
+  border-color: rgba(201,168,124,0.4);
+}
+.db-cal-edit-bar-active {
+  background: rgba(201,168,124,0.06);
+  border: 1px solid rgba(201,168,124,0.2);
+  border-radius: 6px;
+  padding: 10px 16px;
+}
+.db-cal-edit-hint {
+  font-size: 13px;
+  color: var(--rose);
+}
+.db-cal-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+.db-cal-discard-btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: rgba(250,247,242,0.4);
+  background: none;
+  border: 1px solid rgba(250,247,242,0.1);
+  border-radius: 4px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.db-cal-discard-btn:hover { color: #f07a7a; border-color: rgba(240,100,100,0.3); }
+.db-cal-save-btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--espresso-deep);
+  background: var(--rose);
+  border: none;
+  border-radius: 4px;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.db-cal-save-btn:hover:not(:disabled) { background: var(--rose-light); }
+.db-cal-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.db-cal-event-pending {
+  border: 1px dashed var(--rose) !important;
+  opacity: 0.85;
+}
+.db-cal-event-pending-dot {
+  font-size: 8px;
+  color: var(--rose);
+  margin-left: 4px;
+}
