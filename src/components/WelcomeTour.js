@@ -5,7 +5,7 @@ import './WelcomeTour.css';
 
 const STEPS = [
   {
-    target:  null, // fullscreen overlay
+    target:  null,
     title:   'Bun venit în Afrodita!',
     desc:    'Ești la un pas de primul booking online. Îți arătăm rapid cum funcționează — durează mai puțin de 2 minute.',
     cta:     'Hai să începem',
@@ -16,15 +16,15 @@ const STEPS = [
     title:   'Azi — centrul tău de comandă',
     desc:    'Aici vezi toate programările din ziua curentă, câte sunt confirmate și câte în așteptare.',
     cta:     'Înțeles',
-    icon:    '',
+    icon:    '◎',
     position: 'right',
   },
   {
     target:  'db-nav-item-Săptămână',
     title:   'Calendarul săptămânal',
-    desc:    'Vizualizează întreaga săptămână dintr-o privire. Pe planurile Pro și Business poți muta programările direct prin drag & drop.',
+    desc:    'Vizualizează întreaga săptămână dintr-o privire. Pe planurile Pro și Business poți muta programările prin drag & drop.',
     cta:     'Înțeles',
-    icon:    '🗓',
+    icon:    '▦',
     position: 'right',
   },
   {
@@ -32,23 +32,23 @@ const STEPS = [
     title:   'Statistici & Insights',
     desc:    'Grafice cu evoluția programărilor, top servicii, top angajați și insight-uri despre ora și ziua cea mai aglomerată.',
     cta:     'Înțeles',
-    icon:    '',
+    icon:    '↗',
     position: 'right',
   },
   {
     target:  'db-copy-btn',
     title:   'Linkul tău de booking',
-    desc:    'Acesta este linkul pe care îl dai clienților — pune-l pe Instagram, WhatsApp, Google sau site-ul tău. Clienții se programează singuri.',
+    desc:    'Acesta este linkul pe care îl dai clienților — pune-l pe Instagram, WhatsApp sau site-ul tău. Clienții se programează singuri.',
     cta:     'Înțeles',
-    icon:    '',
-    position: 'bottom',
+    icon:    '⌘',
+    position: 'top',
   },
   {
     target:  'db-nav-item-Setări',
     title:   'Configurează salonul',
     desc:    'Adaugă serviciile, angajații cu programul lor și orele de lucru. Cu cât e mai complet, cu atât booking-ul e mai precis.',
     cta:     'Înțeles',
-    icon:    '',
+    icon:    '◈',
     position: 'right',
   },
   {
@@ -56,7 +56,7 @@ const STEPS = [
     title:   'Ești gata!',
     desc:    'Copiază linkul de booking și trimite-l primilor tăi clienți. Primul booking online e la un pas distanță.',
     cta:     'Să începem!',
-    icon:    '',
+    icon:    '→',
   },
 ];
 
@@ -108,23 +108,25 @@ export default function WelcomeTour({ user, onComplete }) {
   if (pos) {
     const { rect, position } = pos;
     const pad = 16;
+    const cardW = 300;
+
     if (position === 'right') {
       tooltipStyle = {
-        top:  rect.top + rect.height / 2,
-        left: rect.right + pad,
+        top:  Math.max(16, rect.top + rect.height / 2),
+        left: Math.min(rect.right + pad, window.innerWidth - cardW - 16),
         transform: 'translateY(-50%)',
       };
     } else if (position === 'bottom') {
       tooltipStyle = {
         top:  rect.bottom + pad,
-        left: rect.left + rect.width / 2,
+        left: Math.max(16, Math.min(rect.left + rect.width / 2, window.innerWidth - cardW - 16)),
         transform: 'translateX(-50%)',
       };
     } else if (position === 'top') {
       tooltipStyle = {
-        top:  rect.top - pad,
-        left: rect.left + rect.width / 2,
-        transform: 'translate(-50%, -100%)',
+        top:  Math.max(16, rect.top - pad - 200),
+        left: Math.max(16, Math.min(rect.left + rect.width / 2, window.innerWidth - cardW - 16)),
+        transform: 'translateX(-50%)',
       };
     }
   }
