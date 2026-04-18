@@ -93,6 +93,31 @@ export default function DashboardScreen() {
     } catch {
       console.warn('Email nu a putut fi trimis.');
     }
+
+    // Trimite SMS
+    if (booking.clientPhone) {
+      try {
+        const cancelUrl = `${window.location.origin}/cancel/${bookingId}`;
+        const dateFormatted = formatDateFromStr(booking.date);
+        await fetch('/api/send-sms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone:        booking.clientPhone,
+            clientName:   booking.clientName,
+            serviceName:  booking.serviceName,
+            employeeName: booking.employeeName,
+            date:         dateFormatted,
+            timeSlot:     booking.timeSlot,
+            status,
+            cancelUrl,
+            salonName:    salon?.name || '',
+          }),
+        });
+      } catch {
+        console.warn('SMS nu a putut fi trimis.');
+      }
+    }
   }
 
   async function handleLogout() {

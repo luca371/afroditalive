@@ -83,6 +83,28 @@ export default function CancelBookingScreen() {
         }
       }
 
+          // Trimite SMS de anulare
+          if (booking?.clientPhone) {
+            try {
+              await fetch('/api/send-sms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  phone:        booking.clientPhone,
+                  serviceName:  booking.serviceName,
+                  employeeName: booking.employeeName,
+                  date:         booking.date,
+                  timeSlot:     booking.timeSlot,
+                  status:       'cancelled',
+                  cancelUrl:    '',
+                  salonName:    salon?.name || '',
+                }),
+              });
+            } catch {
+              console.warn('SMS anulare nu a putut fi trimis.');
+            }
+          }
+
       setStatus('done');
     } catch {
       setStatus('error');

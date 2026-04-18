@@ -1,5 +1,6 @@
-const admin  = require('firebase-admin');
-const emailjs = require('@emailjs/nodejs');
+const admin   = require('firebase-admin');
+const emailjs  = require('@emailjs/nodejs');
+const { sendSMS } = require('./sms');
 
 if (!admin.apps.length) {
   const privateKey = process.env.FIREBASE_PRIVATE_KEY
@@ -77,6 +78,15 @@ module.exports = async (req, res) => {
             privateKey: process.env.EMAILJS_PRIVATE_KEY,
           }
         );
+
+        // Trimite SMS reminder
+        if (booking.clientPhone) {
+          const cancelUrl = `${process.env.APP_URL || 'https://afroditalive.vercel.app'}/cancel/${booking.id}`;
+          await sendSMS(
+            booking.clientPhone,
+            `Reminder ${salon.name || 'Salon'}: Ai programare mâine la ${booking.timeSlot} (${booking.serviceName} cu ${booking.employeeName}). Anulează: ${cancelUrl}`
+          );
+        }
 
         // Marchează că reminder-ul a fost trimis
         await db.collection('bookings').doc(booking.id).update({
