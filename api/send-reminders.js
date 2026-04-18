@@ -58,6 +58,7 @@ module.exports = async (req, res) => {
             time:          booking.timeSlot,
             message:       `Reminder: ai o programare mâine la ${booking.timeSlot}. Te așteptăm!`,
             status:        'Reminder',
+            messagecancel: 'Dacă nu mai poți ajunge, anulează aici:',
             client_name:   booking.clientName,
             client_email:  booking.clientEmail,
             salon_name:    salon.name || '',

@@ -73,6 +73,7 @@ export default function DashboardScreen() {
         time:          booking.timeSlot,
         message:       messages[status],
         status:        statuses[status],
+        messagecancel: status === 'confirmed' ? 'Dacă dorești să anulezi programarea, apasă aici:' : '',
         client_name:   booking.clientName,
         client_email:  booking.clientEmail,
         salon_name:    salon?.name || '',

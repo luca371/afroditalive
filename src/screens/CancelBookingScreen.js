@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import emailjs from '@emailjs/browser';
 import { db } from '../firebase';
 import './CancelBookingScreen.css';
 
@@ -44,10 +45,44 @@ export default function CancelBookingScreen() {
     setLoading(true);
     try {
       await updateDoc(doc(db, 'bookings', bookingId), {
-        status: 'cancelled',
+        status:      'cancelled',
         cancelledAt: new Date().toISOString(),
         cancelledBy: 'client',
       });
+
+      // Trimite email de confirmare anulare
+      if (booking?.clientEmail) {
+        const serviceId  = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+        const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+        const publicKey  = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+        if (serviceId && templateId && publicKey) {
+          try {
+            await emailjs.send(serviceId, templateId, {
+              name:          booking.clientName,
+              email:         booking.clientEmail,
+              time:          booking.timeSlot,
+              message:       'Programarea ta a fost anulată cu succes la cererea ta.',
+              status:        'Anulat',
+              messagecancel: '',
+              client_name:   booking.clientName,
+              client_email:  booking.clientEmail,
+              salon_name:    salon?.name || '',
+              service_name:  booking.serviceName,
+              employee_name: booking.employeeName,
+              date:          booking.date,
+              time_slot:     booking.timeSlot,
+              duration:      booking.duration,
+              price:         booking.price || '',
+              address:       salon?.address ? `${salon.address}, ${salon.city}` : '',
+              phone:         salon?.phone || '',
+              cancel_url:    '',
+            }, publicKey);
+          } catch {
+            console.warn('Email anulare nu a putut fi trimis.');
+          }
+        }
+      }
+
       setStatus('done');
     } catch {
       setStatus('error');
