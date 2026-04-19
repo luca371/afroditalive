@@ -11,17 +11,12 @@ import {
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { canAddEmployee, getPlanLimits, hasCalendar, hasStats, canAddService } from '../utils/planLimits';
+import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
 import UpgradeModal from '../components/UpgradeModal';
 import WelcomeTour  from '../components/WelcomeTour';
 import './DashboardScreen.css';
 
-function getAllowedViews(plan) {
-  const views = ['Azi', 'Setări'];
-  if (hasCalendar(plan)) views.splice(1, 0, 'Programări', 'Săptămână');
-  if (hasStats(plan))    views.splice(-1, 0, 'Statistici');
-  return views;
-}
+const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Statistici', 'Setări'];
 
 export default function DashboardScreen() {
   const { user, salon, setSalon, logout } = useAuth();
@@ -303,7 +298,7 @@ export default function DashboardScreen() {
         <div className="db-sidebar-logo">Afrodita</div>
 
         <nav className="db-nav">
-          {getAllowedViews(salon?.plan || 'free').map(v => (
+          {VIEWS.map(v => (
             <button
               key={v}
               className={`db-nav-item db-nav-item-${v} ${view === v ? 'active' : ''}`}
@@ -317,17 +312,6 @@ export default function DashboardScreen() {
               {v}
             </button>
           ))}
-          {/* Locked views pentru free */}
-          {!hasCalendar(salon?.plan || 'free') && (
-            <button className="db-nav-item db-nav-item-locked" onClick={() => setShowUpgrade(true)}>
-              <IconCalendar /> Săptămână 🔒
-            </button>
-          )}
-          {!hasStats(salon?.plan || 'free') && (
-            <button className="db-nav-item db-nav-item-locked" onClick={() => setShowUpgrade(true)}>
-              <IconStats /> Statistici 🔒
-            </button>
-          )}
         </nav>
 
         <div className="db-sidebar-bottom">
@@ -959,17 +943,6 @@ function SettingsView({ user, salon, setSalon, navigate, onUpgrade }) {
   async function handleSave() {
     setSaving(true); setError(''); setSaved(false);
     try {
-      // Verifică limita de servicii la salvare
-      if (tab === 'servicii') {
-        const plan = salon?.plan || 'free';
-        const namedServices = services.filter(s => s.name?.trim());
-        if (!canAddService(plan, namedServices.length - 1)) {
-          const limits = getPlanLimits(plan);
-          setError(`Planul ${plan} permite maxim ${limits.maxServices} servicii. Upgrade pentru mai multe.`);
-          setSaving(false);
-          return;
-        }
-      }
       const payload = tab === 'info'     ? { ...info }
                     : tab === 'servicii' ? { services }
                     : tab === 'angajati' ? { employees }
@@ -986,16 +959,7 @@ function SettingsView({ user, salon, setSalon, navigate, onUpgrade }) {
   }
 
   const updateSvc  = (i, f, v) => setServices(p  => p.map((s, idx) => idx === i ? { ...s, [f]: v } : s));
-  const addSvc = () => {
-    const plan = salon?.plan || 'free';
-    const namedCount = services.filter(s => s.name?.trim()).length;
-    if (!canAddService(plan, namedCount)) {
-      const limits = getPlanLimits(plan);
-      setError(`Planul ${plan} permite maxim ${limits.maxServices} servicii. Upgrade pentru mai multe.`);
-      return;
-    }
-    setServices(p => [...p, { name: '', duration: 60, price: '' }]);
-  };
+  const addSvc     = ()        => setServices(p  => [...p, { name: '', duration: 60, price: '' }]);
   const removeSvc  = (i)       => setServices(p  => p.filter((_, idx) => idx !== i));
   const updateEmp  = (i, f, v) => setEmployees(p => p.map((e, idx) => idx === i ? { ...e, [f]: v } : e));
   const addEmp     = () => {
@@ -1079,20 +1043,6 @@ function SettingsView({ user, salon, setSalon, navigate, onUpgrade }) {
           {/* SERVICII */}
           {tab === 'servicii' && (
             <>
-              {(() => {
-                const plan = salon?.plan || 'free';
-                const limits = getPlanLimits(plan);
-                const namedCount = services.filter(s => s.name?.trim()).length;
-                if (limits.maxServices === Infinity || namedCount < limits.maxServices) return null;
-                return (
-                  <div className="db-plan-limit-banner">
-                    <span>
-                      Ai atins limita de <strong>{limits.maxServices} servicii</strong> pentru planul <strong>{plan}</strong>.
-                    </span>
-                    <button className="db-upgrade-btn" onClick={onUpgrade}>Upgrade →</button>
-                  </div>
-                );
-              })()}
               <div className="db-set-list">
                 {services.map((s, i) => (
                   <div key={i} className="db-set-list-item">

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { canAddEmployee, getPlanLimits, canAddService } from '../utils/planLimits';
+import { canAddEmployee, getPlanLimits } from '../utils/planLimits';
 import './OnboardingScreen.css';
 
 const STEPS = ['Salon', 'Servicii', 'Angajați', 'Program'];
@@ -50,15 +50,6 @@ export default function OnboardingScreen() {
     if (step === 1 && services.some(s => !s.name.trim())) {
       setError('Completează numele fiecărui serviciu.'); return;
     }
-    if (step === 1) {
-      const plan = salon?.plan || 'free';
-      const limits = getPlanLimits(plan);
-      const namedCount = services.filter(s => s.name?.trim()).length;
-      if (namedCount > limits.maxServices) {
-        setError(`Planul ${plan} permite maxim ${limits.maxServices} servicii. Șterge câteva sau upgradează.`);
-        return;
-      }
-    }
     if (step === 2 && employees.some(e => !e.name.trim())) {
       setError('Completează numele fiecărui angajat.'); return;
     }
@@ -96,13 +87,6 @@ export default function OnboardingScreen() {
     setServices(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: val } : s));
   }
   function addService() {
-    const plan = salon?.plan || 'free';
-    const namedCount = services.filter(s => s.name?.trim()).length;
-    if (!canAddService(plan, namedCount)) {
-      const limits = getPlanLimits(plan);
-      setError(`Planul ${plan} permite maxim ${limits.maxServices} servicii. Upgrade pentru mai multe.`);
-      return;
-    }
     setServices(prev => [...prev, { name: '', duration: 60, price: '' }]);
   }
   function removeService(i) {

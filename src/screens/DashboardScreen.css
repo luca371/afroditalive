@@ -477,7 +477,7 @@
 
 /* ── SETĂRI ── */
 .db-settings {
-  max-width: 100%;
+  max-width: 680px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -577,8 +577,7 @@
 .db-settings-row a:hover { color: var(--rose); }
 
 /* Edit fields */
-.db-set-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-@media (max-width: 700px) { .db-set-fields { grid-template-columns: 1fr; } }
+.db-set-fields { display: flex; flex-direction: column; gap: 16px; }
 
 .db-set-field { display: flex; flex-direction: column; gap: 6px; }
 .db-set-field label {
@@ -1169,16 +1168,4 @@
 .db-cal-edit-btn-locked:hover {
   color: var(--rose) !important;
   border-color: rgba(201,168,124,0.3) !important;
-}
-
-/* ── NAV LOCKED ── */
-.db-nav-item-locked {
-  opacity: 0.35;
-  cursor: pointer;
-  font-size: 12px;
-}
-.db-nav-item-locked:hover {
-  opacity: 0.6;
-  background: rgba(201,168,124,0.05) !important;
-  color: var(--rose) !important;
 }
