@@ -219,13 +219,13 @@ function InteractiveMockup({ lang = 'ro' }) {
 const T = {
   ro: {
     navHow: 'Cum funcționează', navFeatures: 'Funcții', navPricing: 'Prețuri', navCta: 'Încearcă gratuit',
-    badge: 'Programări inteligente pentru saloane',
+    badge: '',
     heroTitle1: 'Eleganța', heroTitle2: 'digitală', heroTitle3: 'a salonului tău',
     heroSub: 'Booking online. Dashboard complet. Zero complicații.',
     heroDesc: 'Afrodita transformă programările telefonice în rezervări online elegante — pentru clienții tăi și pentru tine.',
     heroBtn: 'Începe gratuit', heroGhost: 'Descoperă cum funcționează',
     howLabel: 'Cum funcționează', howTitle1: 'Simplu pentru tine.', howTitle2: 'Elegant', howTitle3: 'pentru clienți.',
-    howSub: 'De la configurare la prima programare — în mai puțin de 30 de minute.',
+    howSub: 'De la configurare la prima programare — în mai puțin de 5 minute.',
     steps: [
       { name: 'Creezi contul', desc: 'Înregistrezi salonul, adaugi serviciile, angajații și programul de lucru.' },
       { name: 'Partajezi linkul', desc: 'Primești un link unic pe care îl pui pe Instagram, Google sau site-ul tău.' },
@@ -255,20 +255,20 @@ const T = {
     ctaTitle1: 'Pregătit să transformi', ctaTitle2: 'salonul tău?',
     ctaSub: 'Gratuit pentru totdeauna. Fără card bancar.',
     ctaBtn: 'Creează contul gratuit',
-    ctaNote: 'Îl configurezi complet în mai puțin de 30 de minute',
+    ctaNote: 'Îl configurezi complet în mai puțin de 5 minute',
     footerTerms: 'Termeni', footerPrivacy: 'Confidențialitate', footerContact: 'Contact',
     footerCopy: '© 2025 Afroditalive. Construit în România.',
     currency: 'lei/lună',
   },
   en: {
     navHow: 'How it works', navFeatures: 'Features', navPricing: 'Pricing', navCta: 'Try for free',
-    badge: 'Smart booking for beauty salons',
+    badge: '',
     heroTitle1: 'The digital', heroTitle2: 'elegance', heroTitle3: 'of your salon',
     heroSub: 'Online booking. Full dashboard. Zero hassle.',
     heroDesc: 'Afrodita turns phone bookings into elegant online reservations — for your clients and for you.',
     heroBtn: 'Get started free', heroGhost: 'Discover how it works',
     howLabel: 'How it works', howTitle1: 'Simple for you.', howTitle2: 'Elegant', howTitle3: 'for your clients.',
-    howSub: 'From setup to first booking — in less than 30 minutes.',
+    howSub: 'From setup to first booking — in less than 5 minutes.',
     steps: [
       { name: 'Create your account', desc: 'Register your salon, add services, employees and working hours.' },
       { name: 'Share your link', desc: 'Get a unique link to put on Instagram, Google or your website.' },
@@ -298,7 +298,7 @@ const T = {
     ctaTitle1: 'Ready to transform', ctaTitle2: 'your salon?',
     ctaSub: 'Free forever. No credit card required.',
     ctaBtn: 'Create free account',
-    ctaNote: 'Full setup in less than 30 minutes',
+    ctaNote: 'Full setup in less than 5 minutes',
     footerTerms: 'Terms', footerPrivacy: 'Privacy', footerContact: 'Contact',
     footerCopy: '© 2025 Afroditalive. Built in Romania.',
     currency: 'RON/mo',
@@ -370,9 +370,11 @@ export default function LandingScreen() {
       <section className="l-hero">
         <div className="l-hero-lines" />
 
-        <div className="l-hero-badge">
-          {t.badge}
-        </div>
+        {t.badge && (
+          <div className="l-hero-badge">
+            {t.badge}
+          </div>
+        )}
 
         <h1 className="l-hero-title">
           {lang === 'ro' ? (
