@@ -11,12 +11,10 @@ import {
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { canAddEmployee, getPlanLimits, hasDashboard, hasCalendar, hasStats, hasDragDrop, canAddService } from '../utils/planLimits';
+import { canAddEmployee, getPlanLimits, hasCalendar, hasStats, canAddService } from '../utils/planLimits';
 import UpgradeModal from '../components/UpgradeModal';
 import WelcomeTour  from '../components/WelcomeTour';
 import './DashboardScreen.css';
-
-const VIEWS = ['Azi', 'Programări', 'Săptămână', 'Statistici', 'Setări'];
 
 function getAllowedViews(plan) {
   const views = ['Azi', 'Setări'];
