@@ -156,6 +156,7 @@
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
   box-shadow: 0 4px 20px rgba(201,168,124,0.2);
   margin-top: 4px;
+  width: 100%;
 }
 .auth-btn:hover:not(:disabled) {
   background: var(--rose-light);
@@ -244,5 +245,10 @@
 
 .auth-card-label,
 .auth-card-title {
+  text-align: center;
+}
+
+.auth-card .auth-btn {
+  width: 100%;
   text-align: center;
 }
