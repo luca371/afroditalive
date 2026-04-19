@@ -63,6 +63,9 @@ export default function LoginScreen() {
                 Am trimis un link de resetare la <strong>{resetEmail}</strong>.
                 Urmează instrucțiunile din email pentru a-ți seta o nouă parolă.
               </p>
+              <p className="auth-reset-spam">
+                Nu găsești emailul? Verifică folderul <strong>Spam</strong> sau <strong>Junk</strong>.
+              </p>
               <button
                 className="auth-btn"
                 onClick={() => { setResetMode(false); setResetSent(false); setResetEmail(''); }}
