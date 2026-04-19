@@ -225,7 +225,7 @@ const T = {
     heroDesc: 'Afrodita transformă programările telefonice în rezervări online elegante — pentru clienții tăi și pentru tine.',
     heroBtn: 'Începe gratuit', heroGhost: 'Descoperă cum funcționează',
     howLabel: 'Cum funcționează', howTitle1: 'Simplu pentru tine.', howTitle2: 'Elegant', howTitle3: 'pentru clienți.',
-    howSub: 'De la configurare la prima programare — în mai puțin de 5 de minute.',
+    howSub: 'De la configurare la prima programare — în mai puțin de 30 de minute.',
     steps: [
       { name: 'Creezi contul', desc: 'Înregistrezi salonul, adaugi serviciile, angajații și programul de lucru.' },
       { name: 'Partajezi linkul', desc: 'Primești un link unic pe care îl pui pe Instagram, Google sau site-ul tău.' },
@@ -245,10 +245,10 @@ const T = {
     pricingLabel: 'Prețuri', pricingTitle1: 'Transparent.', pricingTitle2: 'Fără surprize.',
     pricingSub: 'Alegi planul potrivit. Poți schimba oricând.',
     plans: [
-      { name: 'Free', price: '0', period: 'Pentru totdeauna', features: ['1 angajat', 'Până la 30 programări/lună', 'Pagina publică de booking', 'Email confirmare automată', 'Dashboard de bază'], cta: 'Începe gratuit' },
-      { name: 'Starter', price: '15', period: 'Facturare lunară', features: ['3 angajați', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Calendar săptămânal', 'Statistici de bază'], cta: 'Alege Starter' },
-      { name: 'Pro', price: '45', period: 'Facturare lunară', features: ['10 angajați', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Statistici avansate cu grafice', 'Reprogramare drag & drop din calendar', 'Prioritate la suport'], cta: 'Alege Pro', badge: 'Cel mai ales', featured: true },
-      { name: 'Business', price: '99', period: 'Facturare lunară', features: ['Angajați nelimitați', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Statistici complete', 'Reprogramare drag & drop din calendar', 'Onboarding dedicat 1:1'], cta: 'Alege Business' },
+      { name: 'Free', price: '0', period: 'Pentru totdeauna', features: ['1 angajat', 'Maxim 3 servicii', 'Maxim 10 programări/lună', 'Pagina publică de booking', 'Email confirmare automată'], cta: 'Începe gratuit' },
+      { name: 'Starter', price: '15', period: 'Facturare lunară', features: ['3 angajați', 'Maxim 10 servicii', 'Programări nelimitate', 'Dashboard + calendar săptămânal', 'Email + SMS confirmare', 'SMS reminder 24h înainte'], cta: 'Alege Starter' },
+      { name: 'Pro', price: '45', period: 'Facturare lunară', features: ['10 angajați', 'Servicii nelimitate', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Statistici avansate cu grafice', 'Reprogramare drag & drop din calendar', 'Prioritate la suport'], cta: 'Alege Pro', badge: 'Cel mai ales', featured: true },
+      { name: 'Business', price: '99', period: 'Facturare lunară', features: ['Angajați nelimitați', 'Servicii nelimitate', 'Programări nelimitate', 'Email + SMS confirmare', 'SMS reminder 24h înainte', 'Statistici complete', 'Reprogramare drag & drop din calendar', 'Onboarding dedicat 1:1'], cta: 'Alege Business' },
     ],
     quote: '„De când am Afrodita, nu mai pierd timp la telefon. Clientele se programează singure, chiar și duminica la miezul nopții."',
     quoteAuthor: 'Andreea M. · Studio Lumière, București',
@@ -288,10 +288,10 @@ const T = {
     pricingLabel: 'Pricing', pricingTitle1: 'Transparent.', pricingTitle2: 'No surprises.',
     pricingSub: 'Choose the right plan. Change anytime.',
     plans: [
-      { name: 'Free', price: '0', period: 'Forever', features: ['1 staff member', 'Up to 30 bookings/month', 'Public booking page', 'Automatic email confirmation', 'Basic dashboard'], cta: 'Get started free' },
-      { name: 'Starter', price: '15', period: 'Monthly billing', features: ['3 staff members', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Weekly calendar', 'Basic analytics'], cta: 'Choose Starter' },
-      { name: 'Pro', price: '45', period: 'Monthly billing', features: ['10 staff members', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Advanced analytics with charts', 'Drag & drop rescheduling from calendar', 'Priority support'], cta: 'Choose Pro', badge: 'Most popular', featured: true },
-      { name: 'Business', price: '99', period: 'Monthly billing', features: ['Unlimited staff', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Full analytics', 'Drag & drop rescheduling from calendar', 'Dedicated 1:1 onboarding'], cta: 'Choose Business' },
+      { name: 'Free', price: '0', period: 'Forever', features: ['1 staff member', 'Max 3 services', 'Up to 10 bookings/month', 'Public booking page', 'Automatic email confirmation'], cta: 'Get started free' },
+      { name: 'Starter', price: '15', period: 'Monthly billing', features: ['3 staff members', 'Max 10 services', 'Unlimited bookings', 'Dashboard + weekly calendar', 'Email + SMS confirmation', 'SMS reminder 24h before'], cta: 'Choose Starter' },
+      { name: 'Pro', price: '45', period: 'Monthly billing', features: ['10 staff members', 'Unlimited services', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Advanced analytics with charts', 'Drag & drop rescheduling from calendar', 'Priority support'], cta: 'Choose Pro', badge: 'Most popular', featured: true },
+      { name: 'Business', price: '99', period: 'Monthly billing', features: ['Unlimited staff', 'Unlimited services', 'Unlimited bookings', 'Email + SMS confirmation', 'SMS reminder 24h before', 'Full analytics', 'Drag & drop rescheduling from calendar', 'Dedicated 1:1 onboarding'], cta: 'Choose Business' },
     ],
     quote: '"Since I started using Afrodita, I no longer waste time on the phone. Clients book themselves, even on Sunday at midnight."',
     quoteAuthor: 'Andreea M. · Studio Lumière, Bucharest',
@@ -369,6 +369,10 @@ export default function LandingScreen() {
       {/* ─── HERO ─── */}
       <section className="l-hero">
         <div className="l-hero-lines" />
+
+        <div className="l-hero-badge">
+          {t.badge}
+        </div>
 
         <h1 className="l-hero-title">
           {lang === 'ro' ? (

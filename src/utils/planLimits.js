@@ -1,27 +1,43 @@
 export const PLAN_LIMITS = {
   free: {
     maxEmployees:    1,
-    maxBookingsMonth: 30,
+    maxServices:     3,
+    maxBookingsMonth: 10,
     calendarWeekly:  false,
-    multiLocation:   false,
+    dashboard:       false,
+    sms:             false,
+    dragDrop:        false,
+    stats:           false,
   },
   starter: {
     maxEmployees:    3,
+    maxServices:     10,
     maxBookingsMonth: Infinity,
     calendarWeekly:  true,
-    multiLocation:   false,
+    dashboard:       true,
+    sms:             true,
+    dragDrop:        false,
+    stats:           false,
   },
   pro: {
     maxEmployees:    10,
+    maxServices:     Infinity,
     maxBookingsMonth: Infinity,
     calendarWeekly:  true,
-    multiLocation:   false,
+    dashboard:       true,
+    sms:             true,
+    dragDrop:        true,
+    stats:           true,
   },
   business: {
     maxEmployees:    Infinity,
+    maxServices:     Infinity,
     maxBookingsMonth: Infinity,
     calendarWeekly:  true,
-    multiLocation:   true,
+    dashboard:       true,
+    sms:             true,
+    dragDrop:        true,
+    stats:           true,
   },
 };
 
@@ -30,13 +46,35 @@ export function getPlanLimits(plan) {
 }
 
 export function canAddEmployee(plan, currentCount) {
-  const limits = getPlanLimits(plan);
-  return currentCount < limits.maxEmployees;
+  return currentCount < getPlanLimits(plan).maxEmployees;
+}
+
+export function canAddService(plan, currentCount) {
+  return currentCount < getPlanLimits(plan).maxServices;
 }
 
 export function canAddBooking(plan, bookingsThisMonth) {
-  const limits = getPlanLimits(plan);
-  return bookingsThisMonth < limits.maxBookingsMonth;
+  return bookingsThisMonth < getPlanLimits(plan).maxBookingsMonth;
+}
+
+export function hasCalendar(plan) {
+  return getPlanLimits(plan).calendarWeekly;
+}
+
+export function hasDashboard(plan) {
+  return getPlanLimits(plan).dashboard;
+}
+
+export function hasSMS(plan) {
+  return getPlanLimits(plan).sms;
+}
+
+export function hasDragDrop(plan) {
+  return getPlanLimits(plan).dragDrop;
+}
+
+export function hasStats(plan) {
+  return getPlanLimits(plan).stats;
 }
 
 export const PLAN_NAMES = {

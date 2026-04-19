@@ -1169,3 +1169,15 @@
   color: var(--rose) !important;
   border-color: rgba(201,168,124,0.3) !important;
 }
+
+/* ── NAV LOCKED ── */
+.db-nav-item-locked {
+  opacity: 0.35;
+  cursor: pointer;
+  font-size: 12px;
+}
+.db-nav-item-locked:hover {
+  opacity: 0.6;
+  background: rgba(201,168,124,0.05) !important;
+  color: var(--rose) !important;
+}
