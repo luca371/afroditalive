@@ -186,3 +186,58 @@
   .auth-card { padding: 36px 24px; }
   .auth-card-title { font-size: 26px; }
 }
+
+/* ── RESET PAROLĂ ── */
+.auth-forgot {
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: rgba(201,168,124,0.6);
+  cursor: pointer;
+  margin-left: auto;
+  padding: 0;
+  transition: color 0.2s;
+  letter-spacing: 0.04em;
+}
+.auth-forgot:hover { color: var(--rose); }
+
+.auth-field label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-reset-icon {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(39,201,63,0.12);
+  border: 1px solid rgba(39,201,63,0.3);
+  color: #5de07a;
+  font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.auth-reset-note {
+  font-size: 14px;
+  color: rgba(250,247,242,0.5);
+  line-height: 1.7;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.auth-reset-note strong { color: var(--offwhite); }
+
+.auth-back-link {
+  display: block;
+  margin: 16px auto 0;
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: rgba(250,247,242,0.3);
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px;
+}
+.auth-back-link:hover { color: var(--rose); }
