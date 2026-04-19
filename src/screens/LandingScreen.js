@@ -225,7 +225,7 @@ const T = {
     heroDesc: 'Afrodita transformă programările telefonice în rezervări online elegante — pentru clienții tăi și pentru tine.',
     heroBtn: 'Începe gratuit', heroGhost: 'Descoperă cum funcționează',
     howLabel: 'Cum funcționează', howTitle1: 'Simplu pentru tine.', howTitle2: 'Elegant', howTitle3: 'pentru clienți.',
-    howSub: 'De la configurare la prima programare — în mai puțin de 30 de minute.',
+    howSub: 'De la configurare la prima programare — în mai puțin de 5 de minute.',
     steps: [
       { name: 'Creezi contul', desc: 'Înregistrezi salonul, adaugi serviciile, angajații și programul de lucru.' },
       { name: 'Partajezi linkul', desc: 'Primești un link unic pe care îl pui pe Instagram, Google sau site-ul tău.' },
