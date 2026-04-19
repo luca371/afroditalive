@@ -50,7 +50,7 @@ export default function TermeniScreen() {
           <p>Ne rezervăm dreptul de a modifica acești termeni. Te vom notifica prin email cu cel puțin 30 de zile înainte de intrarea în vigoare a modificărilor semnificative.</p>
 
           <h2>10. Contact</h2>
-          <p>Pentru întrebări legate de acești termeni, ne poți contacta la <a href="mailto:contact@afroditalive.ro">contact@afroditalive.ro</a>.</p>
+          <p>Pentru întrebări legate de acești termeni, ne poți contacta la <a href="mailto:afroditaenterprise@gmail.com">afroditaenterprise@gmail.com</a>.</p>
 
         </div>
       </div>

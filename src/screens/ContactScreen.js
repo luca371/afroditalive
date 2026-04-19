@@ -12,7 +12,7 @@ export default function ContactScreen() {
     // Deschide clientul de email cu datele completate
     const body = encodeURIComponent(`Nume: ${form.name}\nEmail: ${form.email}\n\n${form.message}`);
     const subject = encodeURIComponent(form.subject || 'Contact Afrodita');
-    window.location.href = `mailto:contact@afroditalive.ro?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:afroditaenterprise@gmail.com?subject=${subject}&body=${body}`;
     setSent(true);
   }
 
@@ -34,8 +34,8 @@ export default function ContactScreen() {
               <div className="legal-contact-icon">✉</div>
               <div>
                 <div className="legal-contact-label">Email</div>
-                <a href="mailto:contact@afroditalive.ro" className="legal-contact-value">
-                  contact@afroditalive.ro
+                <a href="mailto:afroditaenterprise@gmail.com" className="legal-contact-value">
+                  afroditaenterprise@gmail.com
                 </a>
               </div>
             </div>

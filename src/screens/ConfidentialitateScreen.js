@@ -73,13 +73,13 @@ export default function ConfidentialitateScreen() {
             <li>Portabilitatea datelor</li>
             <li>Opoziția față de prelucrare</li>
           </ul>
-          <p>Pentru exercitarea acestor drepturi, contactează-ne la <a href="mailto:contact@afroditalive.ro">contact@afroditalive.ro</a>.</p>
+          <p>Pentru exercitarea acestor drepturi, contactează-ne la <a href="mailto:afroditaenterprise@gmail.com">afroditaenterprise@gmail.com</a>.</p>
 
           <h2>9. Cookie-uri</h2>
           <p>Folosim cookie-uri esențiale pentru funcționarea platformei (autentificare, sesiune). Nu folosim cookie-uri de tracking sau publicitate.</p>
 
           <h2>10. Contact</h2>
-          <p>Responsabil cu protecția datelor: <a href="mailto:contact@afroditalive.ro">contact@afroditalive.ro</a></p>
+          <p>Responsabil cu protecția datelor: <a href="mailto:afroditaenterprise@gmail.com">afroditaenterprise@gmail.com</a></p>
           <p>Ai dreptul să depui o plângere la <strong>ANSPDCP</strong> (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal) dacă consideri că datele tale sunt prelucrate incorect.</p>
 
         </div>
