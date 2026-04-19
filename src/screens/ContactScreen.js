@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import emailjs from '@emailjs/browser';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import './LegalScreen.css';
 
 export default function ContactScreen() {
@@ -15,30 +16,14 @@ export default function ContactScreen() {
     setSending(true);
     setError('');
     try {
-      await emailjs.send(
-        process.env.REACT_APP_EMAILJS_SERVICE_ID,
-        process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
-        {
-          client_name:   form.name,
-          client_email:  form.email,
-          salon_name:    'Contact Afrodita',
-          service_name:  form.subject || 'Mesaj contact',
-          employee_name: '',
-          date:          new Date().toLocaleDateString('ro-RO'),
-          time_slot:     '',
-          duration:      '',
-          price:         '',
-          address:       '',
-          phone:         '',
-          message:       form.message,
-          status:        'Mesaj nou',
-          messagecancel: '',
-          cancel_url:    '',
-          name:          form.name,
-          email:         'afroditaenterprise@gmail.com',
-        },
-        process.env.REACT_APP_EMAILJS_PUBLIC_KEY
-      );
+      await addDoc(collection(db, 'feedback'), {
+        name:      form.name.trim(),
+        email:     form.email.trim(),
+        subject:   form.subject.trim(),
+        message:   form.message.trim(),
+        createdAt: new Date().toISOString(),
+        read:      false,
+      });
       setSent(true);
     } catch {
       setError('A apărut o eroare. Încearcă din nou sau scrie direct la afroditaenterprise@gmail.com');
