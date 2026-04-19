@@ -57,8 +57,8 @@ export default function LoginScreen() {
           {resetSent ? (
             <>
               <div className="auth-reset-icon">✓</div>
-              <div className="auth-card-label">Email trimis</div>
-              <h1 className="auth-card-title">Verifică emailul</h1>
+              <div className="auth-card-label" style={{ textAlign: 'center' }}>Email trimis</div>
+              <h1 className="auth-card-title" style={{ textAlign: 'center' }}>Verifică emailul</h1>
               <p className="auth-reset-note">
                 Am trimis un link de resetare la <strong>{resetEmail}</strong>.
                 Urmează instrucțiunile din email pentru a-ți seta o nouă parolă.

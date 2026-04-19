@@ -241,3 +241,8 @@
   padding: 4px;
 }
 .auth-back-link:hover { color: var(--rose); }
+
+.auth-card-label,
+.auth-card-title {
+  text-align: center;
+}
