@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import './LoginScreen.css';
 
@@ -13,12 +11,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
-
-  const [resetMode, setResetMode]       = useState(false);
-  const [resetEmail, setResetEmail]     = useState('');
-  const [resetSent, setResetSent]       = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
-  const [resetError, setResetError]     = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -34,89 +26,16 @@ export default function LoginScreen() {
     }
   }
 
-  async function handleReset(e) {
-    e.preventDefault();
-    setResetError('');
-    setResetLoading(true);
-    try {
-      await sendPasswordResetEmail(auth, resetEmail);
-      setResetSent(true);
-    } catch (err) {
-      setResetError(getFriendlyError(err.code));
-    } finally {
-      setResetLoading(false);
-    }
-  }
-
-  if (resetMode) {
-    return (
-      <div className="auth-page">
-        <div className="auth-glow" />
-        <Link to="/" className="auth-logo">Afrodita</Link>
-        <div className="auth-card">
-          {resetSent ? (
-            <>
-              <div className="auth-reset-icon">✓</div>
-              <div className="auth-card-label" style={{ textAlign: 'center' }}>Email trimis</div>
-              <h1 className="auth-card-title" style={{ textAlign: 'center' }}>Verifică emailul</h1>
-              <p className="auth-reset-note">
-                Am trimis un link de resetare la <strong>{resetEmail}</strong>.
-                Urmează instrucțiunile din email pentru a-ți seta o nouă parolă.
-              </p>
-              <p className="auth-reset-spam">
-                Nu găsești emailul? Verifică folderul <strong>Spam</strong> sau <strong>Junk</strong>.
-              </p>
-              <button
-                className="auth-btn"
-                onClick={() => { setResetMode(false); setResetSent(false); setResetEmail(''); }}
-              >
-                Înapoi la autentificare
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="auth-card-label">Resetare parolă</div>
-              <h1 className="auth-card-title">Ai uitat parola?</h1>
-              <p className="auth-reset-note">
-                Introdu emailul contului tău și îți trimitem un link pentru a seta o nouă parolă.
-              </p>
-              <form className="auth-form" onSubmit={handleReset}>
-                <div className="auth-field">
-                  <label>Email cont</label>
-                  <input
-                    type="email"
-                    placeholder="salon@email.ro"
-                    value={resetEmail}
-                    onChange={e => setResetEmail(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-                {resetError && <div className="auth-error">{resetError}</div>}
-                <button className="auth-btn" type="submit" disabled={resetLoading}>
-                  {resetLoading ? 'Se trimite...' : 'Trimite link de resetare'}
-                </button>
-              </form>
-              <button
-                className="auth-back-link"
-                onClick={() => { setResetMode(false); setResetError(''); }}
-              >
-                ← Înapoi la autentificare
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="auth-page">
       <div className="auth-glow" />
+
       <Link to="/" className="auth-logo">Afrodita</Link>
+
       <div className="auth-card">
         <div className="auth-card-label">Bine ai revenit</div>
         <h1 className="auth-card-title">Intră în cont</h1>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
             <label>Email</label>
@@ -129,17 +48,9 @@ export default function LoginScreen() {
               autoFocus
             />
           </div>
+
           <div className="auth-field">
-            <label>
-              Parolă
-              <button
-                type="button"
-                className="auth-forgot"
-                onClick={() => { setResetMode(true); setResetEmail(email); }}
-              >
-                Ai uitat parola?
-              </button>
-            </label>
+            <label>Parolă</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -148,11 +59,14 @@ export default function LoginScreen() {
               required
             />
           </div>
+
           {error && <div className="auth-error">{error}</div>}
+
           <button className="auth-btn" type="submit" disabled={loading}>
             {loading ? 'Se încarcă...' : 'Intră în cont'}
           </button>
         </form>
+
         <div className="auth-footer">
           Nu ai cont?{' '}
           <Link to="/register">Creează unul gratuit</Link>
